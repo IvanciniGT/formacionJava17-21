@@ -5,11 +5,11 @@
 // - Function<T,R>   Representa una funación que acepta un argumento de tipo T y devuelve un resultado de tipo R
 //          función interna: R apply(T t)
 // - Consumer<T>     Representa una función que acepta un argumento de tipo T y no devuelve ningún resultado (void)
-//          función interna: void accept(T t)
+//          función interna: void accept(T t)                        setter
 // - Supplier<R>     Representa una función que no acepta argumentos y devuelve un resultado de tipo R
-//          función interna: R get()
+//          función interna: R get()                                 getter
 // - Predicate<T>    Representa una función que acepta un argumento de tipo T y devuelve un valor booleano (true o false)
-//          función interna: boolean test(T t)
+//          función interna: boolean test(T t)                       isXXX, hasXXX
 // Dentro de este paqueta hay como 40 interfaces funcionales, variantes de estas: BiFunction<T,U,R>, BiConsumer<T,U>, BiPredicate<T,U>
 import java.util.function.*;
 import java.util.*;

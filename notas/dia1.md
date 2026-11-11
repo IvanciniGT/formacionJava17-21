@@ -250,7 +250,7 @@ public interface Diccionario {
 Un Optional es como una CAJA!
 La CAJA me lla devuelven siempre... pero puede tener algo dentro o no! YA NO HAY AMBIGUEDAD
 
-Cuando me den lacaja, miro si tiene algo (.isPresent()) o si está vacía (.isEmpty()).
+Cuando me den la caja, miro si tiene algo (.isPresent()) o si está vacía (.isEmpty()).
 Caso que tenga algo, puedo sacarlo (.get()).. Si intento sacarlo y no tiene nada dentro, me dará una exception: NoSuchElementException.
 
 Incluso, puedo intentar sacarlo, dando un valor por defecto en caso de que esté vacío:
@@ -519,7 +519,7 @@ TARDE: Ya llevamos muchos años creando clases INMUTABLES con otra sintaxis: LOM
 ```java
 @Value
 public class Persona {
-    String nombre;
+    String nombre = "Juan";
     int edad;
 }
 // Eso si.. esto se usa de la forma en la que la industria está acostumbrada:
@@ -530,7 +530,7 @@ System.out.println(persona.getEdad());
 
 ```
 
-En este sentido, de mejorar la MENTENIBILIDAD del código hay otro cambio que se añadió en JAVA 1.8: Los métodos default en interfaces.
+En este sentido, de mejorar la MANTENIBILIDAD del código hay otro cambio que se añadió en JAVA 1.8: Los métodos default en interfaces.
 Son métodos muy mal entendidos:
 
 Puedo meter código en una interfaz? CLARO QUESI... desde java 1.8. Y de varias formas: con métodos default, o con métodos estáticos públicos (los privados llegaron en java 1.9.. otra cagada ... lo hicieron a medias).
@@ -660,7 +660,7 @@ public interface Diccionario {
     Optional<List<String>> getDefiniciones(@NonNull String palabra) throws ExceptionDatoNoRecuperable;
 
 }
-// Día 102? Otra vez la oficina a todo el mundo Kalasnikov en mano que su códigono compila! No están tratando la exception
+// Día 102? Otra vez la oficina a todo el mundo Kalasnikov en mano que su código no compila! No están tratando la exception
 // Solución:
 
 public interface Diccionario {
@@ -684,3 +684,21 @@ public interface Diccionario {
 ```
 
 Los default en interfaces sirven para ofrecer una forma de ir evolucionando los contratos sin romper las implementaciones existentes.
+Tiene sentido al trabajar con una arquitectura de componentes desacoplados y especialmente cuando trabajo con una metodología ágil.
+Si trabajo con un monolito y con una metodología Waterfall (tradicional)... esto no tiene gracia. NO AYUDA. No aplica... O poco.
+
+Las metodologías, las arquitecturas, los patrones, los lenguajes, las herramientas.. todo evoluciona en PARALELO para dar respuesta (desde todos los ángulos) a los problemas que tenemos en cada momento del tiempo.
+
+---
+
+# Versionado de software
+
+En software usamos el versionado semantivo habitualmente (semVer)
+
+vA.B.C
+
+                Cúando suben?
+A = MAJOR       Breaking changes: Cambios que rompen compatibilidad
+B = MINOR       Nuevas funcionalidades
+                Algún métod existente se marca como deprecado (obsoleto) 
+C = PATCH       Arreglos de bugs
