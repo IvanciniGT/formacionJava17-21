@@ -15,7 +15,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 
 // Que todo encaja de verdad: el bean del suministrador, los jars de idioma en el classpath,
 // el controlador importado y springdoc.
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
+        properties = "spring.datasource.url=jdbc:h2:mem:arranque")
 class ServidorArrancaTest {
 
     @Value("${local.server.port}")

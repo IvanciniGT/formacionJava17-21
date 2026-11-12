@@ -13,7 +13,7 @@
 
     <groupId>com.curso.diccionario</groupId>
     <artifactId>diccionarios-app-servidor</artifactId>
-    <version>1.0.0</version>
+    <version>2.0.0</version>
     <name>Diccionario - Servidor REST</name>
 
     <properties>
@@ -40,12 +40,24 @@
             <artifactId>diccionarios-service-impl</artifactId>
             <version>1.1.0</version>
         </dependency>
-        <!-- compile y no runtime como en la app de consola: aquí no hay ServiceLoader,
-             la configuración crea la implementación con new y por eso la tiene que ver. -->
+        <!-- 2.0.0: el repositorio en ficheros sale del ensamblado y entra el de BBDD, con el cargador
+             que la llena desde los jars de idioma al arrancar. Ni una línea de código cambia: los
+             dos traen su autoconfiguración. Pero es un MAJOR: esta versión necesita una BBDD, y la
+             anterior no; no funciona en el mismo entorno que la 1.0.0. -->
         <dependency>
             <groupId>com.curso.diccionario</groupId>
-            <artifactId>diccionarios-impl-ficheros</artifactId>
-            <version>1.1.0</version>
+            <artifactId>diccionarios-impl-bbdd</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>cargador-de-bbdd-palabras</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
         </dependency>
         <!-- Un jar por idioma: los idiomas que sirve el servidor son los jars que lleva. -->
         <dependency>

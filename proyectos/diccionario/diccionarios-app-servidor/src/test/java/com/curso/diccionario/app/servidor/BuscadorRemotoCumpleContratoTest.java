@@ -14,7 +14,12 @@ import com.curso.diccionario.service.rest.BuscadorDePalabrasRemoto;
 // HTTP + controlador + servicio del servidor + repositorio se comportan igual que el servicio local:
 // quien lo use no nota que hay una red por medio.
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT,
-        classes = { ServidorDeDiccionarios.class, ServidorConDatosDePrueba.class })
+        classes = { ServidorDeDiccionarios.class, ServidorConDatosDePrueba.class },
+        properties = {
+                // El servicio remoto contra el servidor, con datos de prueba puestos a mano: ni el
+                // repositorio en BBDD ni el cargador, que leería los jars de idioma.
+                "spring.autoconfigure.exclude=com.curso.diccionario.impl.bbdd.AutoConfiguracionDeDiccionariosEnBBDD,com.curso.diccionario.cargador.AutoConfiguracionDelCargador",
+                "spring.datasource.url=jdbc:h2:mem:contrato" })
 class BuscadorRemotoCumpleContratoTest extends ContratoBuscadorDePalabrasTest {
 
     @Value("${local.server.port}")

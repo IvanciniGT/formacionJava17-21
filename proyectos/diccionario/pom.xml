@@ -24,6 +24,8 @@
         <module>diccionarios-controlador-rest-api</module>
         <module>diccionarios-controlador-rest</module>
         <module>diccionarios-service-impl-rest</module>
+        <module>diccionarios-impl-bbdd</module>
+        <module>cargador-de-bbdd-palabras</module>
         <module>diccionarios-app-servidor</module>
         <module>diccionarios-app-consola-servidor</module>
     </modules>

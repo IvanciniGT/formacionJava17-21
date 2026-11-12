@@ -1,4 +1,4 @@
-# Java LTS: de Java 8 a Java 21 · proyecto diccionario, rama `v2.0-servidor-central`
+# Java LTS: de Java 8 a Java 21 · proyecto diccionario, rama `v3.0-bbdd`
 
 Esta rama solo tiene el proyecto, tal y como estaba en esta versión. Las notas de cada día
 de clase están en la rama `main`.
