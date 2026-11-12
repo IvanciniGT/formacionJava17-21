@@ -74,4 +74,52 @@ este solo para consultar.
 notas/      las notas de cada día de clase (dia1.md, dia2.md, ...)
 ```
 
-Según avancemos irán apareciendo carpetas con los proyectos de ejemplo.
+El código del proyecto del curso no está en esta rama, sino en las suyas (ver abajo).
+
+---
+
+## El proyecto del diccionario, rama a rama
+
+Durante el curso trabajamos sobre un mismo proyecto: buscar una palabra en el diccionario de un
+idioma. Empieza siendo una app de consola con ficheros y acaba con un servidor central, una base
+de datos y un frontal web, **sin tener que reescribir lo que ya funcionaba**: cada paso añade
+piezas nuevas y toca lo mínimo.
+
+Cada paso está en su propia rama. Todas compilan, pasan sus pruebas y funcionan:
+
+| Rama | Qué trae | Java que se ve ahí |
+|---|---|---|
+| `v1.0-consola-ficheros` | La consola con ficheros, ya partida en piezas: API, implementación, interfaz de usuario y un jar por idioma | `Optional`, *streams* y lambdas, módulos (`module-info`), `ServiceLoader`, `record`, *text blocks* |
+| `v1.1-api-que-avisa-de-errores` | El API cambia sin romper a nadie, para poder avisar de los errores | métodos `default`, `@Deprecated(forRemoval)`, `sealed`, `switch` con patrones (Java 21) |
+| `v2.0-servidor-central` | Los diccionarios se van a un servidor REST, y la consola se elige entre ficheros o servidor sin tocar código | `java.net.http.HttpClient`, `ConcurrentHashMap.computeIfAbsent` |
+| `v3.0-bbdd` | El servidor guarda los diccionarios en una base de datos | Spring Data JPA, transacciones |
+| `v3.1-sugerencias` | Si la palabra no existe, sugiere las parecidas | `record` local, `parallelStream`, otra evolución del API |
+| `v4.0-frontal-web` | Un frontal web en Angular contra el mismo servidor | (TypeScript: la misma arquitectura en otro lenguaje) |
+
+Cada rama tiene en `proyectos/diccionario/README.md` qué trae, cómo se ejecuta y qué cambia
+respecto a la anterior.
+
+### Cómo verlas
+
+La forma más cómoda es sacar cada rama en su propia carpeta, al lado de este repositorio, sin
+tocar la de las notas:
+
+```bash
+git fetch
+git worktree add ../diccionario-v1.0 v1.0-consola-ficheros
+git worktree add ../diccionario-v2.0 v2.0-servidor-central
+```
+
+O cambiar de rama en esta misma carpeta, y volver a `main` para las notas:
+
+```bash
+git switch v1.0-consola-ficheros
+git switch main
+```
+
+Y para ver qué cambió de un paso al siguiente:
+
+```bash
+git diff v1.0-consola-ficheros v1.1-api-que-avisa-de-errores --stat
+git diff v1.0-consola-ficheros v1.1-api-que-avisa-de-errores -- proyectos/diccionario/diccionarios-api
+```
