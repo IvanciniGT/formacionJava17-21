@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.curso.diccionario</groupId>
+        <artifactId>diccionario-padre</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>diccionarios-service-impl-rest</artifactId>
+    <version>1.0.0</version>
+    <name>Diccionarios - Servicio de búsqueda remoto (contra el servidor REST)</name>
+
+    <dependencies>
+        <!-- Implementa el SERVICIO, no el repositorio: lo que viaja por la red son las preguntas al
+             servicio, y los diccionarios se quedan en el servidor. -->
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-service-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-controlador-rest-api</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.14.0</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <!-- Las pruebas se compilan dentro del módulo: solo ellas leen jdk.httpserver. -->
+                        <id>default-testCompile</id>
+                        <configuration>
+                            <compilerArgs>
+                                <arg>--add-modules</arg>
+                                <arg>jdk.httpserver</arg>
+                                <arg>--add-reads</arg>
+                                <arg>impl.service.diccionarios.rest=jdk.httpserver</arg>
+                            </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!-- Las pruebas levantan un servidor falso con com.sun.net.httpserver (módulo jdk.httpserver),
+                         que este módulo no requiere ni debe requerir: en el classpath está disponible sin más. -->
+                    <useModulePath>false</useModulePath>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

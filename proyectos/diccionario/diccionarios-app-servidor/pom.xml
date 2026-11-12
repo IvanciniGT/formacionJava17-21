@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- Aquí sí parent de Spring Boot: es la aplicación que se ejecuta, no una librería. -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.1.0</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.curso.diccionario</groupId>
+    <artifactId>diccionarios-app-servidor</artifactId>
+    <version>1.0.0</version>
+    <name>Diccionario - Servidor REST</name>
+
+    <properties>
+        <java.version>21</java.version>
+        <springdoc.version>3.1.0</springdoc.version>
+        <!-- El parent de Spring Boot 4 ya no gestiona su versión. -->
+        <exec-maven-plugin.version>3.6.3</exec-maven-plugin.version>
+    </properties>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-controlador-rest</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-api</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <!-- El servicio de búsqueda: la lógica de negocio vive aquí, en el servidor central. -->
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-service-impl</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <!-- compile y no runtime como en la app de consola: aquí no hay ServiceLoader,
+             la configuración crea la implementación con new y por eso la tiene que ver. -->
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-impl-ficheros</artifactId>
+            <version>1.1.0</version>
+        </dependency>
+        <!-- Un jar por idioma: los idiomas que sirve el servidor son los jars que lleva. -->
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionario-es</artifactId>
+            <version>1.1.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionario-en</artifactId>
+            <version>1.0.1</version>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc</artifactId>
+        </dependency>
+        <!-- Sirve la spec en /v3/api-docs y la interfaz en /swagger-ui.html. -->
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+            <version>${springdoc.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <!-- Para probar que el servicio remoto cumple el contrato del servicio contra este servidor de verdad. -->
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-service-impl-rest</artifactId>
+            <version>1.0.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-service-impl</artifactId>
+            <version>1.1.0</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-api</artifactId>
+            <version>1.1.0</version>
+            <type>test-jar</type>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+            <!-- Este proyecto no es un módulo de diccionario-padre, pero el agregador lo incluye:
+                 sin esto, `mvn package exec:exec` desde la raíz falla aquí por no tener nada que lanzar. -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>${exec-maven-plugin.version}</version>
+                <configuration>
+                    <skip>true</skip>
+                    <executable>${java.home}/bin/java</executable>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

@@ -21,6 +21,11 @@
         <module>ui-impl-consola</module>
         <module>diccionarios-app-consola</module>
         <module>diccionarios-app-consola-ficheros</module>
+        <module>diccionarios-controlador-rest-api</module>
+        <module>diccionarios-controlador-rest</module>
+        <module>diccionarios-service-impl-rest</module>
+        <module>diccionarios-app-servidor</module>
+        <module>diccionarios-app-consola-servidor</module>
     </modules>
 
     <properties>

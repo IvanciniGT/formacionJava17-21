@@ -1,4 +1,4 @@
-# Java LTS: de Java 8 a Java 21 · proyecto diccionario, rama `v1.2-repositorio-que-avisa-de-errores`
+# Java LTS: de Java 8 a Java 21 · proyecto diccionario, rama `v2.0-servidor-central`
 
 Esta rama solo tiene el proyecto, tal y como estaba en esta versión. Las notas de cada día
 de clase están en la rama `main`.

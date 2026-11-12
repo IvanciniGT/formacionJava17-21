@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.curso.diccionario</groupId>
+        <artifactId>diccionario-padre</artifactId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
+
+    <!-- LA APLICACIÓN: el ensamblado. No tiene ni una línea de código: dice qué piezas, y en qué
+         versión, forman esta entrega. Esta: la consola contra el servidor central. Ni lógica de negocio, ni repositorio, ni diccionarios en la máquina del usuario: solo el servicio remoto.
+         Cambiar una pieza (otro diccionario, otra interfaz) es sacar una versión nueva de esto,
+         sin tocar el código de nadie: control de configuración. -->
+    <artifactId>diccionarios-app-consola-servidor</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>Diccionario - diccionarios-app-consola-servidor</name>
+
+    <!-- runtime: nadie compila contra las implementaciones. La app solo las conoce a través del
+         ServiceLoader; aquí solo se dice cuáles van en el module path. -->
+    <dependencies>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-app-consola</artifactId>
+            <version>1.0.0</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>ui-impl-consola</artifactId>
+            <version>1.0.1</version>
+            <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.curso.diccionario</groupId>
+            <artifactId>diccionarios-service-impl-rest</artifactId>
+            <version>1.0.0</version>
+            <scope>runtime</scope>
+        </dependency>
+    </dependencies>
+
+    <properties>
+        <!-- mvn package exec:exec -Dargumentos="es MELON" -->
+        <argumentos></argumentos>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <configuration>
+                    <skip>false</skip>
+                    <!-- Module path y no classpath: si no, module-info, provides/uses y los opens
+                         no se aplican y el ServiceLoader funcionaría por otras razones.
+                         ALL-MODULE-PATH: los jars de diccionarios no los requiere nadie, y un
+                         módulo que nadie requiere no se carga.
+                         %classpath es solo la lista de rutas (el token %modulepath no se sustituye en
+                         commandlineArgs); lo que la convierte en module path es la opción que la precede. -->
+                    <commandlineArgs>--module-path %classpath --add-modules ALL-MODULE-PATH --module app/com.curso.diccionario.app.consola.BuscarPalabra ${argumentos}</commandlineArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
