@@ -37,23 +37,30 @@ public class BuscadorDePalabrasEnDiccionarios implements BuscadorDePalabras {
                 .orElseThrow(() -> new IllegalStateException("No hay ningún SuministradorDeDiccionarios en el module path")));
     }
 
-    // En la 1.0.0 del API de diccionarios no hay forma de que un fallo llegue hasta aquí: la
-    // excepción del servicio está en la firma (el contrato ya la prevé), pero esta versión no
-    // tiene de dónde sacarla.
+    // 1.1.0: el repositorio (API de diccionarios 1.1.0) ya sabe avisar de los errores, y el servicio
+    // los convierte en BuscadorDePalabrasException. Quien usa el servicio no cambia ni una línea:
+    // para él el servicio sigue siendo el mismo (su API sigue en la 1.0.0).
 
     @Override
-    public List<String> idiomasDisponibles() {
-        // Sin versión que avise: si falla, getIdiomas solo puede devolver una lista vacía.
-        return suministrador.getIdiomas();
+    public List<String> idiomasDisponibles() throws BuscadorDePalabrasException {
+        try {
+            return suministrador.getIdiomasDisponibles();
+        } catch (Exception e) {
+            throw new BuscadorDePalabrasException("No se pudieron averiguar los idiomas", e);
+        }
     }
 
     @Override
-    public boolean idiomaSoportado(@NonNull String idioma) {
-        return suministrador.tienesDiccionarioDe(normalizarIdioma(idioma));
+    public boolean idiomaSoportado(@NonNull String idioma) throws BuscadorDePalabrasException {
+        try {
+            return suministrador.tienesDiccionarioDeIdioma(normalizarIdioma(idioma));
+        } catch (Exception e) {
+            throw new BuscadorDePalabrasException("No se pudo comprobar el idioma " + idioma, e);
+        }
     }
 
     @Override
-    public ResultadoDeBusqueda buscarExacta(@NonNull String palabra, @NonNull String idioma) {
+    public ResultadoDeBusqueda buscarExacta(@NonNull String palabra, @NonNull String idioma) throws BuscadorDePalabrasException {
         // Java 8: Optional, para decir en la firma que el valor puede no estar, en vez de devolver null.
         Optional<Diccionario> diccionario = diccionarioDe(normalizarIdioma(idioma));
         if (diccionario.isEmpty()) {
@@ -63,7 +70,7 @@ public class BuscadorDePalabrasEnDiccionarios implements BuscadorDePalabras {
     }
 
     @Override
-    public ResultadoDeBusqueda buscarIgnorandoMayusculasYAcentos(@NonNull String palabra, @NonNull String idioma) {
+    public ResultadoDeBusqueda buscarIgnorandoMayusculasYAcentos(@NonNull String palabra, @NonNull String idioma) throws BuscadorDePalabrasException {
         Optional<Diccionario> diccionario = diccionarioDe(normalizarIdioma(idioma));
         if (diccionario.isEmpty()) {
             return new IdiomaNoSoportado(palabra, idioma);
@@ -82,7 +89,7 @@ public class BuscadorDePalabrasEnDiccionarios implements BuscadorDePalabras {
         return encontradaONo(diccionario.get(), enElDiccionario.orElse(palabra), palabra, idioma);
     }
 
-    private ResultadoDeBusqueda encontradaONo(Diccionario diccionario, String enElDiccionario, String palabra, String idioma) {
+    private ResultadoDeBusqueda encontradaONo(Diccionario diccionario, String enElDiccionario, String palabra, String idioma) throws BuscadorDePalabrasException {
         Optional<List<Significado>> significados = significadosDe(diccionario, enElDiccionario);
         if (significados.isEmpty()) {
             return new PalabraNoEncontrada(palabra, idioma);
@@ -90,16 +97,28 @@ public class BuscadorDePalabrasEnDiccionarios implements BuscadorDePalabras {
         return new PalabraEncontrada(enElDiccionario, diccionario.getIdioma(), significados.get());
     }
 
-    private Optional<Diccionario> diccionarioDe(String idioma) {
-        return suministrador.getDiccionario(idioma);
+    private Optional<Diccionario> diccionarioDe(String idioma) throws BuscadorDePalabrasException {
+        try {
+            return suministrador.getDiccionarioBuena(idioma);
+        } catch (Exception e) {
+            throw new BuscadorDePalabrasException("No se pudo cargar el diccionario de " + idioma, e);
+        }
     }
 
-    private static Optional<List<Significado>> significadosDe(Diccionario diccionario, String palabra) {
-        return diccionario.getSignificados(palabra);
+    private static Optional<List<Significado>> significadosDe(Diccionario diccionario, String palabra) throws BuscadorDePalabrasException {
+        try {
+            return diccionario.buscarSignificados(palabra);
+        } catch (Exception e) {
+            throw new BuscadorDePalabrasException("Error al buscar " + palabra + " en " + diccionario.getIdioma(), e);
+        }
     }
 
-    private static List<String> palabrasDe(Diccionario diccionario) {
-        return diccionario.getPalabras();
+    private static List<String> palabrasDe(Diccionario diccionario) throws BuscadorDePalabrasException {
+        try {
+            return diccionario.listarPalabras();
+        } catch (Exception e) {
+            throw new BuscadorDePalabrasException("No se pudieron leer las palabras de " + diccionario.getIdioma(), e);
+        }
     }
 
     // El idioma es un código, no una palabra: "es", "Es" y "ES" son el mismo, en todas las búsquedas.

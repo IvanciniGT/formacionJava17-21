@@ -47,7 +47,7 @@ class SuministradorDesdeClasspathTest {
         SuministradorDeDiccionarios suministrador = SuministradorDeDiccionariosDesdeFicheros.provider();
 
         // Acción
-        List<String> idiomas = suministrador.getIdiomas();
+        List<String> idiomas = suministrador.getIdiomasDisponibles();
 
         // Resultado esperado
         assertEquals(List.of("ES"), idiomas);

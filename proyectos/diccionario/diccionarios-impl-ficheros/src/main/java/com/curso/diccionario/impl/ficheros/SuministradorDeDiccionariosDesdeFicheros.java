@@ -1,6 +1,7 @@
 package com.curso.diccionario.impl.ficheros;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.lang.System.Logger.Level;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -10,7 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
-import java.util.WeakHashMap;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import com.curso.diccionario.api.Diccionario;
@@ -39,7 +40,7 @@ public class SuministradorDeDiccionariosDesdeFicheros implements SuministradorDe
     private final String carpetaConFicherosDeDiccionarios;
     private final CatalogoDeDiccionariosEnClasspath catalogo;
 
-    private final Map<String, Diccionario> cacheDeDiccionarios = new WeakHashMap<>();
+    private final Map<String, Diccionario> cacheDeDiccionarios = new ConcurrentHashMap<>();
     // Un Map no es una buena elección para una cache.
     // El problema es que va engordando indefinidamente y nunca se eliminan entradas antiguas.
     // Puede acabar el sistema colapsando.
@@ -51,6 +52,13 @@ public class SuministradorDeDiccionariosDesdeFicheros implements SuministradorDe
     // WeakHashMap... lo que guarda son referencias débiles a las claves. Si un dato deja de ser referenciado en otro lugar, la entrada se elimina automáticamente cuando el garbage collector lo considere necesario.
     // Me quito del problema de gestionar la cache... Puede engordar un huevo... pero si es necesario, se eliminarán automáticamente las entradas viejas.
     // En java exste el concepto de WeakRefecence, que me permite crear variables que no impiden que el garbage collector elimine el objeto al que apuntan si no hay otras referencias fuertes.
+    //
+    // Versión 1.1.0, antes de llevar esto a un servidor: ConcurrentHashMap y no WeakHashMap, por dos motivos.
+    //  - WeakHashMap no es seguro entre hilos, y un servidor atiende peticiones en paralelo: dos hilos
+    //    escribiendo a la vez pueden corromper el mapa.
+    //  - Y tampoco liberaba nada: el valor (DiccionarioDesdeFichero) guarda en su campo idioma el
+    //    mismo String que es la clave, así que el valor mantenía viva su propia clave.
+    // Con pocos idiomas, y cada uno de unos pocos MB, no merece la pena una cache con expulsión.
 
     public SuministradorDeDiccionariosDesdeFicheros(String carpetaConFicherosDeDiccionarios) {
         this.carpetaConFicherosDeDiccionarios = carpetaConFicherosDeDiccionarios;
@@ -73,21 +81,20 @@ public class SuministradorDeDiccionariosDesdeFicheros implements SuministradorDe
         return carpeta != null ? carpeta : CARPETA_EN_CLASSPATH_POR_DEFECTO;
     }
 
-    // getIdiomas no puede lanzar nada: el API no lo permite. Si no se puede leer la carpeta,
-    // solo queda avisar en el log y devolver una lista vacía... que el que pregunta no sabrá
-    // distinguir de "no hay idiomas". (Lo arreglará la 1.2.0 del API.)
+    // Esta se borrará!
     @Override
     public List<String> getIdiomas() {
         try {
-            return idiomasEnLaCarpeta();
-        } catch (IOException e) {
+            return getIdiomasDisponibles();
+        } catch (Exception e) {
             log.log(Level.WARNING, "No se pudieron averiguar los idiomas disponibles", e);
             // Java 9: List.of / Map.of / Set.of, colecciones inmutables en una línea.
             return List.of();
         }
     }
 
-    private List<String> idiomasEnLaCarpeta() throws IOException {
+    @Override
+    public List<String> getIdiomasDisponibles() throws IOException {
         // Java 11: Path.of y Files.readString / writeString.
         Path carpeta = Path.of(carpetaConFicherosDeDiccionarios);
         if (!Files.isDirectory(carpeta)) {
@@ -105,14 +112,35 @@ public class SuministradorDeDiccionariosDesdeFicheros implements SuministradorDe
         }
     }
 
+    // Esta se borrará!
     @Override
     public boolean tienesDiccionarioDe(@NonNull String idioma) {
-        return cacheDeDiccionarios.containsKey(idioma) || getFicheroParaIdioma(idioma).isPresent();
+        try {
+            return tienesDiccionarioDeIdioma(idioma);
+        } catch (Exception e) {
+            return false;
+        }
     }
 
-    // Java 8: Optional, para decir en la firma que el valor puede no estar, en vez de devolver null.
     @Override
+    public boolean tienesDiccionarioDeIdioma(@NonNull String idioma) throws Exception{
+        return cacheDeDiccionarios.containsKey(idioma)  ||  getFicheroParaIdioma(idioma).isPresent();
+    }
+
+    @Override
+    // Esa se borrará
+    // Java 8: Optional, para decir en la firma que el valor puede no estar, en vez de devolver null.
     public Optional<Diccionario> getDiccionario(@NonNull String idioma) {
+        try {
+            return getDiccionarioBuena(idioma);
+        } catch (Exception e) {
+            log.log(Level.WARNING, "No se pudo cargar el diccionario de " + idioma, e);
+            return Optional.empty();
+        }
+    }
+
+    @Override
+    public Optional<Diccionario> getDiccionarioBuena(@NonNull String idioma) throws Exception {
         // Siempre devuelvo desde cache
         Diccionario enCache = cacheDeDiccionarios.get(idioma);
         if (enCache != null) {
@@ -122,15 +150,20 @@ public class SuministradorDeDiccionariosDesdeFicheros implements SuministradorDe
         if (fichero.isEmpty()) {
             return Optional.empty();
         }
+        // computeIfAbsent y no containsKey + put: con dos peticiones a la vez del mismo idioma,
+        // el fichero se lee una sola vez y las dos reciben el mismo diccionario.
         try {
-            Diccionario leido = new DiccionarioDesdeFichero(idioma, FormatoDeFicheroDeDiccionario.leer(fichero.get()));
-            cacheDeDiccionarios.put(idioma, leido);
-            return Optional.of(leido);
-        } catch (IOException e) {
-            // El API no deja avisar de un error: un fichero ilegible acaba pareciendo
-            // "no tengo ese idioma". Es lo que obliga a cambiar el API en la 1.1.0.
-            log.log(Level.WARNING, "No se pudo cargar el diccionario de " + idioma, e);
-            return Optional.empty();
+            // Java 8: Map.computeIfAbsent, calcula y guarda el valor solo si falta, en una sola operación.
+            return Optional.of(cacheDeDiccionarios.computeIfAbsent(idioma, clave -> {
+                try {
+                    return new DiccionarioDesdeFichero(clave, FormatoDeFicheroDeDiccionario.leer(fichero.get()));
+                } catch (IOException e) {
+                    // La función de computeIfAbsent no puede lanzar comprobadas: se envuelve y se desenvuelve abajo.
+                    throw new UncheckedIOException(e);
+                }
+            }));
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
     }
 

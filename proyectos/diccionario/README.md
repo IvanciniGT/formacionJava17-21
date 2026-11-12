@@ -1,9 +1,9 @@
-# Diccionario · v1.1: Control de configuración
+# Diccionario · v1.2: Un repositorio que avisa de los errores
 
-> Rama `v1.1-control-de-configuracion`. El proyecto evoluciona rama a rama, y cada una compila, pasa sus
+> Rama `v1.2-repositorio-que-avisa-de-errores`. El proyecto evoluciona rama a rama, y cada una compila, pasa sus
 > pruebas y funciona:
 >
-> `v1.0-consola-ficheros` → **`v1.1-control-de-configuracion`** ← estás aquí → `v1.2-repositorio-que-avisa-de-errores` → `v2.0-servidor-central` → `v3.0-bbdd` → `v3.1-sugerencias` → `v4.0-frontal-web`
+> `v1.0-consola-ficheros` → `v1.1-control-de-configuracion` → **`v1.2-repositorio-que-avisa-de-errores`** ← estás aquí → `v2.0-servidor-central` → `v3.0-bbdd` → `v3.1-sugerencias` → `v4.0-frontal-web`
 
 Busca una palabra en el diccionario de un idioma y muestra sus significados con ejemplos.
 
@@ -19,22 +19,26 @@ La palabra melón existe en el idioma ES y tiene los siguientes significados:
 
 ## Qué trae esta versión
 
-**Control de configuración.** Llegan cambios, y cada uno se queda en su componente:
+Antes de llevar nada a un servidor hay que arreglar una cosa del repositorio: en un servidor (con
+BBDD, con red) **las cosas fallan**, y la 1.0.0 no tiene por dónde decirlo. Un fichero ilegible, o
+una BBDD caída, acaban pareciendo *"no existe"*.
 
-- Nuevas palabras en español: `diccionario-es` **1.1.0** (*membrillo*, *atún*, *sandía*...).
-- Erratas en las definiciones de inglés: `diccionario-en` **1.0.1**.
-- Otros mensajes de ayuda en la consola: `ui-impl-consola` **1.0.1**.
-
-Y una versión nueva de la aplicación, `diccionarios-app-consola-ficheros` **1.1.0**, que solo dice
-que ahora lleva esas versiones. El repositorio, el servicio y el código de la app no se tocan.
+- **Repositorio 1.1.0**: cada método tiene un hermano que sí avisa (`throws Exception`):
+  `existeLaPalabra`, `buscarSignificados`, `listarPalabras`, `tienesDiccionarioDeIdioma`,
+  `getDiccionarioBuena`, `getIdiomasDisponibles`. Con **`default`** que delega en el viejo, y el viejo
+  **`@Deprecated(forRemoval = true)`**. Las implementaciones existentes siguen compilando sin tocarlas:
+  es un **minor**. Para eso existen los `default`, no para meter lógica compartida.
+- El repositorio en ficheros 1.1.0 los implementa, y su cache pasa a `ConcurrentHashMap`: un servidor
+  atiende peticiones en paralelo, y el `WeakHashMap` no es seguro entre hilos.
+- **El servicio absorbe el cambio** (1.1.0): convierte los errores en `BuscadorDePalabrasException`.
+  Su API no cambia...
+- ... y por eso el código de la app de consola **no cambia ni una línea**.
 
 ```bash
-git diff v1.0-consola-ficheros v1.1-control-de-configuracion --stat
+git diff v1.1-control-de-configuracion v1.2-repositorio-que-avisa-de-errores -- proyectos/diccionario/diccionarios-api
 ```
 
-Datos, un texto de ayuda y poms: ni una línea de lógica.
-
-Siguiente: `v1.2-repositorio-que-avisa-de-errores`.
+Siguiente: `v2.0-servidor-central`.
 
 ## Requisitos
 
@@ -64,16 +68,16 @@ columna dice qué ha cambiado respecto a la rama anterior.
 
 | Componente | Versión | | Qué es |
 |---|---|---|---|
-| `diccionarios-api` | 1.0.0 |  | El REPOSITORIO (lógica de persistencia): `SuministradorDeDiccionarios`, `Diccionario`, `Significado`. Funciones de bajo nivel, casi un SELECT. Con sus pruebas de contrato (`test-jar`) |
-| `diccionarios-impl-ficheros` | 1.0.0 |  | El repositorio en ficheros: lee los `.txt` de los jars de idioma |
-| `diccionario-es` | 1.1.0 | **1.0.0 → 1.1.0** | Solo datos: el diccionario de español y su índice |
-| `diccionario-en` | 1.0.1 | **1.0.0 → 1.0.1** | Solo datos: el diccionario de inglés y su índice |
+| `diccionarios-api` | 1.1.0 | **1.0.0 → 1.1.0** | El REPOSITORIO (lógica de persistencia): `SuministradorDeDiccionarios`, `Diccionario`, `Significado`. Funciones de bajo nivel, casi un SELECT. Con sus pruebas de contrato (`test-jar`) |
+| `diccionarios-impl-ficheros` | 1.1.0 | **1.0.0 → 1.1.0** | El repositorio en ficheros: lee los `.txt` de los jars de idioma |
+| `diccionario-es` | 1.1.0 |  | Solo datos: el diccionario de español y su índice |
+| `diccionario-en` | 1.0.1 |  | Solo datos: el diccionario de inglés y su índice |
 | `diccionarios-service-api` | 1.0.0 |  | El SERVICIO (lógica de negocio): `BuscadorDePalabras` y su resultado sellado `ResultadoDeBusqueda` (`PalabraEncontrada`, `PalabraNoEncontrada`, `IdiomaNoSoportado`) |
-| `diccionarios-service-impl` | 1.0.0 |  | El servicio de verdad, sobre el repositorio. Con las pruebas de contrato del servicio (`test-jar`) |
+| `diccionarios-service-impl` | 1.1.0 | **1.0.0 → 1.1.0** | El servicio de verdad, sobre el repositorio. Con las pruebas de contrato del servicio (`test-jar`) |
 | `ui-api` | 1.0.0 |  | La interfaz de usuario: todo lo que la app le dice o le pide al usuario |
-| `ui-impl-consola` | 1.0.1 | **1.0.0 → 1.0.1** | La de línea de comandos: lee idioma y palabra de los argumentos |
+| `ui-impl-consola` | 1.0.1 |  | La de línea de comandos: lee idioma y palabra de los argumentos |
 | `diccionarios-app-consola` | 1.0.0 |  | El código de la app de consola: el `main`, las **factorías** y `ProcesadorDePeticiones`, que expone el servicio por la línea de comandos |
-| `diccionarios-app-consola-ficheros` | 1.1.0 | **1.0.0 → 1.1.0** | LA APLICACIÓN, el ensamblado: un pom sin código que dice qué piezas lleva. Todo en local, con ficheros |
+| `diccionarios-app-consola-ficheros` | 1.2.0 | **1.1.0 → 1.2.0** | LA APLICACIÓN, el ensamblado: un pom sin código que dice qué piezas lleva. Todo en local, con ficheros |
 
 ## Comandos
 
@@ -100,7 +104,7 @@ Maven instalado: `./mvnw` (en Windows, `mvnw.cmd`) se baja la versión que toca 
 Con `java` directamente (después de `./mvnw package`), con las piezas que dice su pom:
 
 ```bash
-java --module-path diccionarios-api/target/diccionarios-api-1.0.0.jar:diccionarios-service-api/target/diccionarios-service-api-1.0.0.jar:diccionarios-service-impl/target/diccionarios-service-impl-1.0.0.jar:ui-api/target/ui-api-1.0.0.jar:ui-impl-consola/target/ui-impl-consola-1.0.1.jar:diccionarios-impl-ficheros/target/diccionarios-impl-ficheros-1.0.0.jar:diccionario-es/target/diccionario-es-1.1.0.jar:diccionario-en/target/diccionario-en-1.0.1.jar:diccionarios-app-consola/target/diccionarios-app-consola-1.0.0.jar \
+java --module-path diccionarios-api/target/diccionarios-api-1.1.0.jar:diccionarios-service-api/target/diccionarios-service-api-1.0.0.jar:diccionarios-service-impl/target/diccionarios-service-impl-1.1.0.jar:ui-api/target/ui-api-1.0.0.jar:ui-impl-consola/target/ui-impl-consola-1.0.1.jar:diccionarios-impl-ficheros/target/diccionarios-impl-ficheros-1.1.0.jar:diccionario-es/target/diccionario-es-1.1.0.jar:diccionario-en/target/diccionario-en-1.0.1.jar:diccionarios-app-consola/target/diccionarios-app-consola-1.0.0.jar \
      --add-modules ALL-MODULE-PATH \
      --module app/com.curso.diccionario.app.consola.BuscarPalabra es MEMBRILLO
 ```
@@ -134,7 +138,11 @@ para copiarlas. Las genera, siempre iguales, `herramientas/GeneradorDeDiccionari
 
 ## Cómo evolucionan los API
 
-Todo en 1.0.0. Más adelante el repositorio y el servicio cambiarán **sin romper a nadie**.
+| Versión | Qué cambia | Por qué es un minor |
+|---|---|---|
+| repositorio 1.1.0 (`v1.2`) | Métodos nuevos con `throws Exception` y `default` que delega en el viejo; los viejos, `@Deprecated(forRemoval = true)` | Las implementaciones existentes siguen compilando sin tocarlas |
+
+Los deprecados se quedan a propósito: quitarlos rompería a quien los use y sería un **major**.
 
 ## Pruebas
 
@@ -142,14 +150,13 @@ Todo en 1.0.0. Más adelante el repositorio y el servicio cambiarán **sin rompe
 |---|---|
 | `diccionarios-api` | El **contrato del repositorio**: lo que cualquier implementación tiene que cumplir (`test-jar`). Lo cumple una implementación de referencia en memoria |
 | `diccionarios-impl-ficheros` | El contrato del repositorio, con ficheros generados; el formato; la lectura del classpath y del índice |
-| `diccionarios-service-impl` | El **contrato del servicio** (`test-jar`): las dos búsquedas, la ñ, los tres resultados; las reglas de normalización |
+| `diccionarios-service-impl` | El **contrato del servicio** (`test-jar`): las dos búsquedas, la ñ, los tres resultados; las reglas de normalización; que un error del repositorio llega como `BuscadorDePalabrasException` |
 | `ui-impl-consola`, `diccionarios-app-consola` | Los mensajes de la consola; el procesador con un servicio y una interfaz de usuario falsos, sin capturar la consola |
 
 ## Limitaciones conocidas
 
 - **Diccionarios de mentira.** Las 5000 palabras de cada idioma son inventadas, y se nota.
 - **Sin acentos, si dos palabras se escriben igual** (*papa* y *papá*) y se busca *PAPA*, se encuentra la primera en orden alfabético. La exacta no tiene ese problema.
-- **Los errores no llegan a quien pregunta.** El repositorio 1.0.0 no tiene por dónde decirlo: un fichero ilegible parece *"no existe"*. Lo arregla la `v1.2`.
 - **Solo module path** para las apps de consola: en el classpath el `ServiceLoader` no usa los `provides` de `module-info`.
 
 ## Novedades de Java 8+ en este código
@@ -161,20 +168,23 @@ la introdujo o, si no tiene, su Javadoc).
 
 | Versión | Novedad | Referencia | Dónde se usa |
 |---|---|---|---|
-| Java 8 | Expresiones lambda | [JEP 126](https://openjdk.org/jeps/126) | [BuscadorDePalabrasFactory.java:22](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/BuscadorDePalabrasFactory.java#L22), [InterfazDeUsuarioFactory.java:20](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/InterfazDeUsuarioFactory.java#L20), [SuministradorDeDiccionariosDesdeFicheros.java:99](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L99), y 4 más |
+| Java 8 | Expresiones lambda | [JEP 126](https://openjdk.org/jeps/126) | [BuscadorDePalabrasFactory.java:22](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/BuscadorDePalabrasFactory.java#L22), [InterfazDeUsuarioFactory.java:20](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/InterfazDeUsuarioFactory.java#L20), [SuministradorDeDiccionariosDesdeFicheros.java:106](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L106), y 4 más |
 | Java 8 | Referencias a método (`::`) | [JEP 126](https://openjdk.org/jeps/126) | [CatalogoDeDiccionariosEnClasspath.java:45](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/CatalogoDeDiccionariosEnClasspath.java#L45) |
-| Java 8 | Streams (`stream`, `map`, `filter`, `parallelStream`...) | [JEP 107](https://openjdk.org/jeps/107) | [SuministradorDeDiccionariosDesdeFicheros.java:97](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L97), [CatalogoDeDiccionariosEnClasspath.java:41](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/CatalogoDeDiccionariosEnClasspath.java#L41), [FormatoDeFicheroDeDiccionario.java:41](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/FormatoDeFicheroDeDiccionario.java#L41), y 1 más |
-| Java 8 | `Optional` | [`Optional`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html) | [Diccionario.java:16](diccionarios-api/src/main/java/com/curso/diccionario/api/Diccionario.java#L16), [SuministradorDeDiccionarios.java:17](diccionarios-api/src/main/java/com/curso/diccionario/api/SuministradorDeDiccionarios.java#L17), [ProcesadorDePeticiones.java:34](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/ProcesadorDePeticiones.java#L34), y 6 más |
+| Java 8 | Streams (`stream`, `map`, `filter`, `parallelStream`...) | [JEP 107](https://openjdk.org/jeps/107) | [SuministradorDeDiccionariosDesdeFicheros.java:104](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L104), [CatalogoDeDiccionariosEnClasspath.java:41](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/CatalogoDeDiccionariosEnClasspath.java#L41), [FormatoDeFicheroDeDiccionario.java:41](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/FormatoDeFicheroDeDiccionario.java#L41), y 1 más |
+| Java 8 | `Optional` | [`Optional`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Optional.html) | [Diccionario.java:29](diccionarios-api/src/main/java/com/curso/diccionario/api/Diccionario.java#L29), [SuministradorDeDiccionarios.java:36](diccionarios-api/src/main/java/com/curso/diccionario/api/SuministradorDeDiccionarios.java#L36), [ProcesadorDePeticiones.java:34](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/ProcesadorDePeticiones.java#L34), y 6 más |
+| Java 8 | Métodos `default` en interfaces | [JEP 126](https://openjdk.org/jeps/126) | [Diccionario.java:22](diccionarios-api/src/main/java/com/curso/diccionario/api/Diccionario.java#L22), [SuministradorDeDiccionarios.java:19](diccionarios-api/src/main/java/com/curso/diccionario/api/SuministradorDeDiccionarios.java#L19) |
+| Java 8 | `Map.computeIfAbsent` | [`Map.computeIfAbsent`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/Map.html#computeIfAbsent(K,java.util.function.Function)) | [SuministradorDeDiccionariosDesdeFicheros.java:157](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L157) |
 | Java 9 | Módulos (`module-info.java`: `requires`, `exports`, `uses`, `provides`) | [JEP 261](https://openjdk.org/jeps/261) | [module-info.java:2](diccionarios-api/src/main/java/module-info.java#L2), [module-info.java:2](diccionarios-app-consola/src/main/java/module-info.java#L2), [module-info.java:2](diccionarios-impl-ficheros/src/main/java/module-info.java#L2), y 4 más |
-| Java 9 | `ServiceLoader` sobre módulos (`uses` / `provides`) | [`ServiceLoader`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ServiceLoader.html) | [BuscadorDePalabrasFactory.java:14](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/BuscadorDePalabrasFactory.java#L14), [InterfazDeUsuarioFactory.java:12](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/InterfazDeUsuarioFactory.java#L12), [SuministradorDeDiccionariosDesdeFicheros.java:63](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L63), y 6 más |
-| Java 9 | `List.of` / `Map.of` / `Set.of` | [JEP 269](https://openjdk.org/jeps/269) | [InterfazDeUsuarioFactory.java:22](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/InterfazDeUsuarioFactory.java#L22), [SuministradorDeDiccionariosDesdeFicheros.java:86](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L86) |
+| Java 9 | `ServiceLoader` sobre módulos (`uses` / `provides`) | [`ServiceLoader`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/ServiceLoader.html) | [BuscadorDePalabrasFactory.java:14](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/BuscadorDePalabrasFactory.java#L14), [InterfazDeUsuarioFactory.java:12](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/InterfazDeUsuarioFactory.java#L12), [SuministradorDeDiccionariosDesdeFicheros.java:71](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L71), y 6 más |
+| Java 9 | `List.of` / `Map.of` / `Set.of` | [JEP 269](https://openjdk.org/jeps/269) | [InterfazDeUsuarioFactory.java:22](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/factorias/InterfazDeUsuarioFactory.java#L22), [SuministradorDeDiccionariosDesdeFicheros.java:92](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L92) |
+| Java 9 | `@Deprecated(forRemoval = true)` | [JEP 277](https://openjdk.org/jeps/277) | [Diccionario.java:19](diccionarios-api/src/main/java/com/curso/diccionario/api/Diccionario.java#L19), [SuministradorDeDiccionarios.java:14](diccionarios-api/src/main/java/com/curso/diccionario/api/SuministradorDeDiccionarios.java#L14) |
 | Java 9 | `InputStream.readAllBytes()` | [`InputStream.readAllBytes`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/io/InputStream.html#readAllBytes()) | [FormatoDeFicheroDeDiccionario.java:29](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/FormatoDeFicheroDeDiccionario.java#L29), [FicherosDePruebaTest.java:83](diccionarios-impl-ficheros/src/test/java/com/curso/diccionario/impl/ficheros/FicherosDePruebaTest.java#L83) |
-| Java 10 | `List.copyOf` / `Map.copyOf` | [`List.copyOf`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html#copyOf(java.util.Collection)) | [DiccionarioDesdeFichero.java:39](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/DiccionarioDesdeFichero.java#L39), [PalabraEncontrada.java:26](diccionarios-service-api/src/main/java/com/curso/diccionario/service/api/PalabraEncontrada.java#L26), [InterfazDeUsuarioPorArgumentos.java:20](ui-impl-consola/src/main/java/com/curso/diccionario/ui/consola/argumentos/InterfazDeUsuarioPorArgumentos.java#L20), y 5 más |
-| Java 11 | Métodos nuevos de `String` (`strip`, `isBlank`, `lines`, `repeat`) | [`String`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html#strip()) | [CatalogoDeDiccionariosEnClasspath.java:68](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/CatalogoDeDiccionariosEnClasspath.java#L68), [FormatoDeFicheroDeDiccionario.java:40](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/FormatoDeFicheroDeDiccionario.java#L40), [BuscadorDePalabrasEnDiccionarios.java:109](diccionarios-service-impl/src/main/java/com/curso/diccionario/service/impl/BuscadorDePalabrasEnDiccionarios.java#L109), y 2 más |
-| Java 11 | `Path.of`, `Files.readString` / `writeString` | [`Path.of`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html#of(java.lang.String,java.lang.String...)) | [SuministradorDeDiccionariosDesdeFicheros.java:92](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L92) |
+| Java 10 | `List.copyOf` / `Map.copyOf` | [`List.copyOf`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/List.html#copyOf(java.util.Collection)) | [DiccionarioDesdeFichero.java:43](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/DiccionarioDesdeFichero.java#L43), [PalabraEncontrada.java:26](diccionarios-service-api/src/main/java/com/curso/diccionario/service/api/PalabraEncontrada.java#L26), [InterfazDeUsuarioPorArgumentos.java:20](ui-impl-consola/src/main/java/com/curso/diccionario/ui/consola/argumentos/InterfazDeUsuarioPorArgumentos.java#L20), y 5 más |
+| Java 11 | Métodos nuevos de `String` (`strip`, `isBlank`, `lines`, `repeat`) | [`String`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/lang/String.html#strip()) | [CatalogoDeDiccionariosEnClasspath.java:68](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/CatalogoDeDiccionariosEnClasspath.java#L68), [FormatoDeFicheroDeDiccionario.java:40](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/FormatoDeFicheroDeDiccionario.java#L40), [BuscadorDePalabrasEnDiccionarios.java:128](diccionarios-service-impl/src/main/java/com/curso/diccionario/service/impl/BuscadorDePalabrasEnDiccionarios.java#L128), y 2 más |
+| Java 11 | `Path.of`, `Files.readString` / `writeString` | [`Path.of`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/nio/file/Path.html#of(java.lang.String,java.lang.String...)) | [SuministradorDeDiccionariosDesdeFicheros.java:99](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L99) |
 | Java 15 | Bloques de texto (`"""`) | [JEP 378](https://openjdk.org/jeps/378) | [InterfazDeUsuarioPorArgumentos.java:59](ui-impl-consola/src/main/java/com/curso/diccionario/ui/consola/argumentos/InterfazDeUsuarioPorArgumentos.java#L59), [InterfazDeUsuarioPorArgumentosTest.java:61](ui-impl-consola/src/test/java/com/curso/diccionario/ui/consola/argumentos/InterfazDeUsuarioPorArgumentosTest.java#L61) |
 | Java 16 | `record` | [JEP 395](https://openjdk.org/jeps/395) | [SignificadoDesdeFichero.java:8](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/SignificadoDesdeFichero.java#L8), [IdiomaNoSoportado.java:8](diccionarios-service-api/src/main/java/com/curso/diccionario/service/api/IdiomaNoSoportado.java#L8), [PalabraEncontrada.java:17](diccionarios-service-api/src/main/java/com/curso/diccionario/service/api/PalabraEncontrada.java#L17), y 6 más |
-| Java 16 | `Stream.toList()` | [`Stream.toList`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html#toList()) | [SuministradorDeDiccionariosDesdeFicheros.java:104](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L104), [CatalogoDeDiccionariosEnClasspath.java:52](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/CatalogoDeDiccionariosEnClasspath.java#L52), [FormatoDeFicheroDeDiccionario.java:40](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/FormatoDeFicheroDeDiccionario.java#L40) |
+| Java 16 | `Stream.toList()` | [`Stream.toList`](https://docs.oracle.com/en/java/javase/21/docs/api/java.base/java/util/stream/Stream.html#toList()) | [SuministradorDeDiccionariosDesdeFicheros.java:111](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/SuministradorDeDiccionariosDesdeFicheros.java#L111), [CatalogoDeDiccionariosEnClasspath.java:52](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/CatalogoDeDiccionariosEnClasspath.java#L52), [FormatoDeFicheroDeDiccionario.java:40](diccionarios-impl-ficheros/src/main/java/com/curso/diccionario/impl/ficheros/formato/FormatoDeFicheroDeDiccionario.java#L40) |
 | Java 17 | Clases e interfaces selladas (`sealed` / `permits`) | [JEP 409](https://openjdk.org/jeps/409) | [ResultadoDeBusqueda.java:75](diccionarios-service-api/src/main/java/com/curso/diccionario/service/api/ResultadoDeBusqueda.java#L75) |
 | Java 21 | `switch` con patrones | [JEP 441](https://openjdk.org/jeps/441) | [ProcesadorDePeticiones.java:57](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/ProcesadorDePeticiones.java#L57) |
 | Java 21 | Patrones de `record` (*record patterns*) | [JEP 440](https://openjdk.org/jeps/440) | [ProcesadorDePeticiones.java:59](diccionarios-app-consola/src/main/java/com/curso/diccionario/app/consola/ProcesadorDePeticiones.java#L59) |

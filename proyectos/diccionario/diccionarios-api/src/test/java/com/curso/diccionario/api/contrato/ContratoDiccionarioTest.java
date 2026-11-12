@@ -214,6 +214,22 @@ public abstract class ContratoDiccionarioTest extends ContratoBase {
         }
     }
 
+    // ------------------------------------------------------ métodos de la 1.1.0
+
+    @Test
+    @DisplayName("Contexto: ES con melón | Acción: buscar melón y archilococo con buscarSignificados | Resultado esperado: lo mismo que getSignificados")
+    void buscarSignificadosDiceLoMismoQueGetSignificados() throws Exception {
+        // Contexto
+        Diccionario espanol = diccionarioDe("ES", datosHabituales());
+
+        // Acción y resultado esperado: sin errores, los nuevos solo cambian cómo se avisa de un fallo
+        assertEquals(espanol.getSignificados("melón").map(ContratoDiccionarioTest::comparables),
+                espanol.buscarSignificados("melón").map(ContratoDiccionarioTest::comparables));
+        assertEquals(Optional.empty(), espanol.buscarSignificados("archilococo"));
+        assertTrue(espanol.existeLaPalabra("melón"));
+        assertEquals(Set.copyOf(espanol.getPalabras()), Set.copyOf(espanol.listarPalabras()));
+    }
+
     // ------------------------------------------------------- coherencia interna
 
     @Test

@@ -10,6 +10,10 @@ import com.curso.diccionario.api.Significado;
 import lombok.Getter;
 import lombok.NonNull;
 
+// Igual que en la 1.0.0 del API: leer de un Map en memoria no puede fallar, así que los métodos
+// nuevos que avisan de errores (existeLaPalabra, buscarSignificados, listarPalabras) le sirven
+// tal cual vienen, con su default. Ni una línea cambiada por la 1.1.0.
+@SuppressWarnings("removal")
 public class DiccionarioDesdeFichero implements Diccionario {
     @Getter
     private final String idioma;

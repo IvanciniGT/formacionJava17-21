@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>diccionarios-service-impl</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>Diccionarios - Servicio de búsqueda</name>
 
     <dependencies>
@@ -24,13 +24,13 @@
         <dependency>
             <groupId>com.curso.diccionario</groupId>
             <artifactId>diccionarios-api</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <!-- Los datos de prueba del API de diccionarios, para las pruebas de contrato del servicio. -->
         <dependency>
             <groupId>com.curso.diccionario</groupId>
             <artifactId>diccionarios-api</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
             <type>test-jar</type>
             <scope>test</scope>
         </dependency>

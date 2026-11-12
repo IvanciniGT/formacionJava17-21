@@ -11,6 +11,7 @@ import com.curso.diccionario.api.contrato.DatosDePrueba;
 import com.curso.diccionario.api.contrato.SignificadoDePrueba;
 
 // Lo más tonto que hace de repositorio, para probar el servicio sin ficheros ni BBDD.
+@SuppressWarnings("removal")
 class SuministradorEnMemoria implements SuministradorDeDiccionarios {
 
     private final Map<String, Map<String, List<SignificadoDePrueba>>> diccionarios;

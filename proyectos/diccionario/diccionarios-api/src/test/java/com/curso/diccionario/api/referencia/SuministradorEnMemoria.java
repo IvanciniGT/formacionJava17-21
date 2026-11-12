@@ -16,6 +16,7 @@ import lombok.NonNull;
  * La implementación más tonta posible del API. Solo existe para demostrar que las pruebas
  * de contrato se pueden cumplir: si esta falla, el defecto está en las pruebas.
  */
+@SuppressWarnings("removal")
 class SuministradorEnMemoria implements SuministradorDeDiccionarios {
 
     private final Map<String, Map<String, List<SignificadoDePrueba>>> diccionarios;
