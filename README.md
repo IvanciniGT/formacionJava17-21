@@ -1,10 +1,10 @@
-# Java LTS: de Java 8 a Java 21 · proyecto diccionario, rama `v2.0-servidor-central`
+# Java LTS: de Java 8 a Java 21 · proyecto diccionario
 
-Esta rama solo tiene el proyecto, tal y como estaba en esta versión. Las notas de cada día
-de clase están en la rama `main`.
+Esta rama solo tiene el proyecto, tal y como estaba en una de sus etapas (en cuál:
+`git branch --show-current`). Las notas de cada día de clase están en la rama `main`.
 
-Empieza por [proyectos/diccionario/README.md](proyectos/diccionario/README.md): qué trae esta
-versión, cómo se ejecuta y qué ha cambiado respecto a la anterior.
+Empieza por [proyectos/diccionario/README.md](proyectos/diccionario/README.md): es el mismo en todas
+las ramas, y cuenta el recorrido entero, etapa a etapa, con los comandos de cada una.
 
 Las ramas, en orden:
 
