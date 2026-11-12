@@ -75,8 +75,9 @@ public class ControladorRestDiccionarios implements ApiRestDiccionarios {
                     // Java 8: streams, el map-reduce de Java (stream, map, filter, collect...).
                     // Java 16: Stream.toList(), lista inmutable sin Collectors.toList().
                     new PalabraDTO(i, enElDiccionario, significados.stream().map(this::aDTO).toList());
+            // 1.1.0: las sugerencias del servicio viajan en el cuerpo del 404.
             case PalabraNoEncontrada noEncontrada ->
-                    throw new PalabraNoEncontradaException(noEncontrada.idioma(), noEncontrada.palabra());
+                    throw new PalabraNoEncontradaException(noEncontrada.idioma(), noEncontrada.palabra(), noEncontrada.sugerencias());
             case IdiomaNoSoportado noSoportado ->
                     throw new IdiomaNoDisponibleException(noSoportado.idioma());
         };

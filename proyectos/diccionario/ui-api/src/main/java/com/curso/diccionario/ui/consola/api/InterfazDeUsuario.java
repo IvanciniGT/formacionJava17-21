@@ -20,6 +20,14 @@ public interface InterfazDeUsuario {
 
     void mostrarPalabraNoEncontrada(String idioma, String palabra);
 
+    // 1.1.0: con las palabras parecidas que se le pueden sugerir al usuario (puede venir vacía).
+    // default que delega en el de antes: una interfaz de usuario que no sepa enseñar sugerencias
+    // sigue compilando y funcionando, solo que no las enseña. Minor, no major.
+    // Java 8: método default, para que el interfaz evolucione sin romper a quien ya lo implementa.
+    default void mostrarPalabraNoEncontrada(String idioma, String palabra, List<String> sugerencias) {
+        mostrarPalabraNoEncontrada(idioma, palabra);
+    }
+
     void mostrarIdiomaNoEncontrado(String idioma);
 
     void mostrarErrorDeUsoDelPrograma();

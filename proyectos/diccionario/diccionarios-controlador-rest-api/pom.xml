@@ -7,7 +7,7 @@
          Versiona a su ritmo; quien lo use, lo pide por versión. -->
     <groupId>com.curso.diccionario</groupId>
     <artifactId>diccionarios-controlador-rest-api</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>Diccionarios - API del controlador REST</name>
 
     <properties>
@@ -50,6 +50,12 @@
             <groupId>io.swagger.core.v3</groupId>
             <artifactId>swagger-annotations-jakarta</artifactId>
             <version>${swagger-annotations.version}</version>
+            <optional>true</optional>
+        </dependency>
+        <!-- Solo la anotación @JsonInclude del ErrorDTO: optional, como las de swagger. -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
             <optional>true</optional>
         </dependency>
 

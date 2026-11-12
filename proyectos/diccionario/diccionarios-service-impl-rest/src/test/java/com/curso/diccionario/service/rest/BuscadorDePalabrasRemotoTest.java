@@ -135,4 +135,13 @@ class BuscadorDePalabrasRemotoTest {
         BuscadorDePalabrasException error = assertThrows(BuscadorDePalabrasException.class, () -> sinServidor.buscarExacta("melón", "ES"));
         assertTrue(error.getMessage().startsWith("No se pudo conectar"), error.getMessage());
     }
+
+    @Test
+    @DisplayName("Contexto: 404 de palabra con sugerencias en el cuerpo | Acción: buscar manana | Resultado esperado: no encontrada, con sus sugerencias")
+    void lasSugerenciasVienenEnEl404() throws Exception {
+        servidor.responde(DICCIONARIOS + "/ES/palabras/manana", 404,
+                "{\"codigo\":\"PALABRA_NO_ENCONTRADA\",\"mensaje\":\"No está\",\"sugerencias\":[\"mañana\",\"manzana\"]}");
+
+        assertEquals(new PalabraNoEncontrada("manana", "ES", List.of("mañana", "manzana")), buscador.buscarExacta("manana", "ES"));
+    }
 }

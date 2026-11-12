@@ -26,7 +26,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 @OpenAPIDefinition(
         info = @Info(
                 title = "Servidor de diccionarios",
-                version = "1.0.0",
+                version = "1.1.0",
                 description = "Consulta de palabras y sus significados en los diccionarios de cada idioma."),
         // Relativa: si no, la spec generada al empaquetar llevaría el puerto aleatorio de la generación.
         servers = @Server(url = "/", description = "El mismo servidor que sirve esta especificación"))
@@ -84,7 +84,8 @@ public interface ApiRestDiccionarios {
                     `ignorarMayusculasYAcentos=true` la que encuentra "atún" buscando "Atun" (la ñ sí cuenta).
                     Devuelve la palabra como está escrita en el diccionario, y sus significados, cada uno con
                     sus ejemplos (la lista puede venir vacía). Una palabra encontrada tiene siempre al menos un
-                    significado. Los dos 404 se distinguen por el campo `codigo` del error.""")
+                    significado. Los dos 404 se distinguen por el campo `codigo` del error; el de palabra no
+                    encontrada lleva además las palabras parecidas, en `sugerencias`.""")
     @ApiResponse(responseCode = "200", description = "La palabra existe",
             content = @Content(schema = @Schema(implementation = PalabraDTO.class),
                     examples = @ExampleObject(name = "melón", value = Ejemplos.PALABRA_MELON)))
@@ -114,7 +115,7 @@ public interface ApiRestDiccionarios {
         static final String IDIOMA_NO_DISPONIBLE = """
                 {"codigo":"IDIOMA_NO_DISPONIBLE","mensaje":"No hay diccionario para el idioma XX"}""";
         static final String PALABRA_NO_ENCONTRADA = """
-                {"codigo":"PALABRA_NO_ENCONTRADA","mensaje":"La palabra patata no existe en el idioma ES"}""";
+                {"codigo":"PALABRA_NO_ENCONTRADA","mensaje":"La palabra manana no existe en el idioma ES","sugerencias":["mañana","manzana"]}""";
         static final String PALABRA_MELON = """
                 {"idioma":"ES","palabra":"melón","significados":[\
                 {"texto":"Fruto grande, redondo y de pulpa jugosa y dulce.","ejemplos":["Me gusta comer melón!"]},\

@@ -49,6 +49,14 @@ public class InterfazDeUsuarioPorArgumentos implements InterfazDeUsuario {
     }
 
     @Override
+    public void mostrarPalabraNoEncontrada(String idioma, String palabra, List<String> sugerencias) {
+        mostrarPalabraNoEncontrada(idioma, palabra);
+        if (!sugerencias.isEmpty()) {
+            salida.println("Quizás quisiste decir: " + String.join(", ", sugerencias));
+        }
+    }
+
+    @Override
     public void mostrarIdiomaNoEncontrado(String idioma) {
         salida.println("Lo siento, pero no tengo diccionario para el idioma " + idioma + ".");
     }

@@ -121,11 +121,22 @@ class ControladorRestDiccionariosTest {
 
     @Test
     void unaPalabraQueNoEstaDa404DePalabra() throws Exception {
-        when(buscador.buscarExacta("melón", "ES")).thenReturn(new PalabraNoEncontrada("melón", "ES"));
+        when(buscador.buscarExacta("melon", "ES")).thenReturn(new PalabraNoEncontrada("melon", "ES", List.of("melón", "melo")));
 
-        mvc.perform(get("/api/v1/diccionarios/ES/palabras/melón"))
+        // Las sugerencias, en el cuerpo del 404: el cliente no necesita otra petición.
+        mvc.perform(get("/api/v1/diccionarios/ES/palabras/melon"))
                 .andExpect(status().isNotFound())
-                .andExpect(jsonPath("$.codigo").value("PALABRA_NO_ENCONTRADA"));
+                .andExpect(jsonPath("$.codigo").value("PALABRA_NO_ENCONTRADA"))
+                .andExpect(content().json("{\"sugerencias\":[\"melón\",\"melo\"]}"));
+    }
+
+    @Test
+    void elRestoDeErroresNoLlevaSugerencias() throws Exception {
+        when(buscador.buscarExacta("melón", "XX")).thenReturn(new IdiomaNoSoportado("melón", "XX"));
+
+        mvc.perform(get("/api/v1/diccionarios/XX/palabras/melón"))
+                .andExpect(status().isNotFound())
+                .andExpect(jsonPath("$.sugerencias").doesNotExist());
     }
 
     @Test

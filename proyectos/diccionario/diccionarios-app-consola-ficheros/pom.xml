@@ -14,7 +14,7 @@
          Cambiar una pieza (otro diccionario, otra interfaz) es sacar una versión nueva de esto,
          sin tocar el código de nadie: control de configuración. -->
     <artifactId>diccionarios-app-consola-ficheros</artifactId>
-    <version>1.2.0</version>
+    <version>1.3.0</version>
     <packaging>pom</packaging>
     <name>Diccionario - diccionarios-app-consola-ficheros</name>
 
@@ -24,19 +24,19 @@
         <dependency>
             <groupId>com.curso.diccionario</groupId>
             <artifactId>diccionarios-app-consola</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.curso.diccionario</groupId>
             <artifactId>ui-impl-consola</artifactId>
-            <version>1.0.1</version>
+            <version>1.1.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
             <groupId>com.curso.diccionario</groupId>
             <artifactId>diccionarios-service-impl</artifactId>
-            <version>1.1.0</version>
+            <version>1.2.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>

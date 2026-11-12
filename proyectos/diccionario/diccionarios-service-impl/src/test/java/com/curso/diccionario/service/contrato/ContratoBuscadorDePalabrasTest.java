@@ -92,7 +92,7 @@ public abstract class ContratoBuscadorDePalabrasTest {
     @Test
     @DisplayName("Contexto: ES sin archilococo | Acción: buscarla | Resultado esperado: no encontrada, con lo que se preguntó")
     void exactaNoEncontrada() throws Exception {
-        assertEquals(new PalabraNoEncontrada("archilococo", "es"), buscador().buscarExacta("archilococo", "es"));
+        assertEquals(new PalabraNoEncontrada("archilococo", "es", List.of()), buscador().buscarExacta("archilococo", "es"));
     }
 
     @Test
@@ -121,6 +121,31 @@ public abstract class ContratoBuscadorDePalabrasTest {
     @Test
     @DisplayName("Contexto: ES sin archilococo | Acción: buscarla ignorando | Resultado esperado: no encontrada, con lo que se preguntó")
     void ignorandoNoEncontrada() throws Exception {
-        assertEquals(new PalabraNoEncontrada("ARCHILOCOCO", "ES"), buscador().buscarIgnorandoMayusculasYAcentos("ARCHILOCOCO", "ES"));
+        assertEquals(new PalabraNoEncontrada("ARCHILOCOCO", "ES", List.of()), buscador().buscarIgnorandoMayusculasYAcentos("ARCHILOCOCO", "ES"));
+    }
+
+    // ------------------------------------------------------------------ sugerencias
+
+    @Test
+    @DisplayName("Contexto: ES con melón y pera | Acción: buscar exacta melon | Resultado esperado: no encontrada, con melón como sugerencia")
+    void unaPalabraNoEncontradaLlevaLasParecidas() throws Exception {
+        assertEquals(new PalabraNoEncontrada("melon", "ES", List.of("melón")), buscador().buscarExacta("melon", "ES"));
+    }
+
+    @Test
+    @DisplayName("Contexto: ES con pera a 1 letra, y pena y perla a 2, de pira | Acción: buscar pira | Resultado esperado: pera, pena, perla")
+    void lasSugerenciasVanDeLaMasALaMenosParecida() throws Exception {
+        BuscadorDePalabras buscador = crearBuscadorCon(new DatosDePrueba()
+                .conPalabra("ES", "perla", significado("Bola de nácar."))
+                .conPalabra("ES", "pena", significado("Tristeza."))
+                .conPalabra("ES", "pera", PERA_FRUTO));
+
+        assertEquals(new PalabraNoEncontrada("pira", "ES", List.of("pera", "pena", "perla")), buscador.buscarExacta("pira", "ES"));
+    }
+
+    @Test
+    @DisplayName("Contexto: ES | Acción: buscar algo que no se parece a nada | Resultado esperado: no encontrada, con la lista de sugerencias vacía")
+    void sinNadaParecidoLaListaVaVacia() throws Exception {
+        assertEquals(new PalabraNoEncontrada("archilococo", "ES", List.of()), buscador().buscarExacta("archilococo", "ES"));
     }
 }

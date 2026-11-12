@@ -58,8 +58,10 @@ public class ProcesadorDePeticiones {
             // Record pattern: desmonta el record en la propia rama.
             case PalabraEncontrada(String p, String i, List<Significado> significados) ->
                     interfaz.mostrarSignificadosDePalabra(i, p, significados);
+            // Patrón de tipo y no record pattern: así siguió compilando cuando PalabraNoEncontrada
+            // ganó sus sugerencias (servicio 1.1.0). Ahora solo hay que pasárselas a la interfaz.
             case PalabraNoEncontrada noEncontrada ->
-                    interfaz.mostrarPalabraNoEncontrada(noEncontrada.idioma(), noEncontrada.palabra());
+                    interfaz.mostrarPalabraNoEncontrada(noEncontrada.idioma(), noEncontrada.palabra(), noEncontrada.sugerencias());
             case IdiomaNoSoportado noSoportado ->
                     interfaz.mostrarIdiomaNoEncontrado(noSoportado.idioma());
         }
@@ -71,7 +73,7 @@ public class ProcesadorDePeticiones {
         // if (resultado instanceof PalabraEncontrada encontrada) {
         //     interfaz.mostrarSignificadosDePalabra(encontrada.idioma(), encontrada.palabra(), encontrada.significados());
         // } else if (resultado instanceof PalabraNoEncontrada noEncontrada) {
-        //     interfaz.mostrarPalabraNoEncontrada(noEncontrada.idioma(), noEncontrada.palabra());
+        //     interfaz.mostrarPalabraNoEncontrada(noEncontrada.idioma(), noEncontrada.palabra(), noEncontrada.sugerencias());
         // } else if (resultado instanceof IdiomaNoSoportado noSoportado) {
         //     interfaz.mostrarIdiomaNoEncontrado(noSoportado.idioma());
         // }

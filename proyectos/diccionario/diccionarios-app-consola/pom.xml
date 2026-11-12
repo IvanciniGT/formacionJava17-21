@@ -10,7 +10,7 @@
     </parent>
 
     <artifactId>diccionarios-app-consola</artifactId>
-    <version>1.0.0</version>
+    <version>1.1.0</version>
     <name>Diccionario - App de consola (el código)</name>
 
     <!-- El código de la app de consola: monta las piezas y expone el servicio por la línea de
@@ -20,12 +20,12 @@
         <dependency>
             <groupId>com.curso.diccionario</groupId>
             <artifactId>diccionarios-service-api</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
         <dependency>
             <groupId>com.curso.diccionario</groupId>
             <artifactId>ui-api</artifactId>
-            <version>1.0.0</version>
+            <version>1.1.0</version>
         </dependency>
     </dependencies>
 </project>

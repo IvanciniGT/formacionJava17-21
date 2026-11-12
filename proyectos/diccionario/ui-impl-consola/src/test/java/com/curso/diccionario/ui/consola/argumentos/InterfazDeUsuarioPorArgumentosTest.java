@@ -68,6 +68,25 @@ class InterfazDeUsuarioPorArgumentosTest {
     }
 
     @Test
+    @DisplayName("Contexto: melon no existe y hay 2 parecidas | Acción: mostrarlo | Resultado esperado: el aviso y las sugerencias en una línea")
+    void muestraLasSugerencias() {
+        conArgumentos().mostrarPalabraNoEncontrada("ES", "melon", List.of("melón", "melo"));
+
+        assertEquals("""
+                La palabra melon NO existe en el idioma ES.
+                Quizás quisiste decir: melón, melo
+                """, salida().replace(System.lineSeparator(), "\n"));
+    }
+
+    @Test
+    @DisplayName("Contexto: archilococo no existe y no hay parecidas | Acción: mostrarlo | Resultado esperado: solo el aviso, sin línea de sugerencias vacía")
+    void sinSugerenciasNoMuestraLaLinea() {
+        conArgumentos().mostrarPalabraNoEncontrada("ES", "archilococo", List.of());
+
+        assertEquals("La palabra archilococo NO existe en el idioma ES.\n", salida().replace(System.lineSeparator(), "\n"));
+    }
+
+    @Test
     @DisplayName("Contexto: un error con mensaje | Acción: mostrarlo | Resultado esperado: el mensaje y el aviso de reintentar")
     void elErrorGenericoMuestraElMensaje() {
         conArgumentos().mostrarErrorGenerico(new IllegalStateException("se fue la luz"));

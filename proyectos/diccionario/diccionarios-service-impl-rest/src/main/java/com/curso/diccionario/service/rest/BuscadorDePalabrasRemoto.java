@@ -95,7 +95,8 @@ public class BuscadorDePalabrasRemoto implements BuscadorDePalabras {
                     .toList());
         }
         if (cliente.es404(respuesta, CodigoDeError.PALABRA_NO_ENCONTRADA)) {
-            return new PalabraNoEncontrada(palabra, idioma);
+            // 1.1.0: las sugerencias vienen en el mismo 404, sin otra petición.
+            return new PalabraNoEncontrada(palabra, idioma, cliente.sugerencias(respuesta));
         }
         if (cliente.es404(respuesta, CodigoDeError.IDIOMA_NO_DISPONIBLE)) {
             return new IdiomaNoSoportado(palabra, idioma);

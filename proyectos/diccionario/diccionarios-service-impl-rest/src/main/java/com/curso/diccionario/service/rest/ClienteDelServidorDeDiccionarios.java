@@ -9,6 +9,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
+import java.util.List;
 import java.util.Optional;
 
 import com.curso.diccionario.controlador.rest.api.ApiRestDiccionarios;
@@ -91,6 +92,14 @@ final class ClienteDelServidorDeDiccionarios {
         } catch (JsonParseException e) {
             return Optional.empty();
         }
+    }
+
+    // Las sugerencias que trae el 404 de palabra (desde el contrato REST 1.1.0). Si no vienen, ninguna.
+    List<String> sugerencias(HttpResponse<String> respuesta) throws BuscadorDePalabrasException {
+        ErrorDTO error = leer(respuesta, ErrorDTO.class);
+        // Java 9: List.of / Map.of / Set.of, colecciones inmutables en una línea.
+        // Java 10: List.copyOf / Map.copyOf, copia inmutable (y si ya lo era, no copia nada).
+        return error == null || error.sugerencias() == null ? List.of() : List.copyOf(error.sugerencias());
     }
 
     boolean es404(HttpResponse<String> respuesta, CodigoDeError codigo) {

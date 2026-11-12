@@ -37,9 +37,8 @@ public class BuscadorDePalabrasEnDiccionarios implements BuscadorDePalabras {
                 .orElseThrow(() -> new IllegalStateException("No hay ningún SuministradorDeDiccionarios en el module path")));
     }
 
-    // 1.1.0: el repositorio (API de diccionarios 1.1.0) ya sabe avisar de los errores, y el servicio
-    // los convierte en BuscadorDePalabrasException. Quien usa el servicio no cambia ni una línea:
-    // para él el servicio sigue siendo el mismo (su API sigue en la 1.0.0).
+    // 1.2.0: la palabra no encontrada lleva las palabras parecidas (servicio 1.1.0). Parecida es
+    // lógica de negocio: el repositorio solo da la lista de palabras.
 
     @Override
     public List<String> idiomasDisponibles() throws BuscadorDePalabrasException {
@@ -92,9 +91,15 @@ public class BuscadorDePalabrasEnDiccionarios implements BuscadorDePalabras {
     private ResultadoDeBusqueda encontradaONo(Diccionario diccionario, String enElDiccionario, String palabra, String idioma) throws BuscadorDePalabrasException {
         Optional<List<Significado>> significados = significadosDe(diccionario, enElDiccionario);
         if (significados.isEmpty()) {
-            return new PalabraNoEncontrada(palabra, idioma);
+            return new PalabraNoEncontrada(palabra, idioma, similaresA(diccionario, palabra));
         }
         return new PalabraEncontrada(enElDiccionario, diccionario.getIdioma(), significados.get());
+    }
+
+    // Las sugerencias solo se calculan cuando hacen falta: es un recorrido del diccionario entero.
+    private static List<String> similaresA(Diccionario diccionario, String palabra) throws BuscadorDePalabrasException {
+        // Java 11: métodos nuevos de String (isBlank, strip, lines, repeat...).
+        return PalabrasSimilares.a(palabra.strip().toLowerCase(Locale.ROOT), palabrasDe(diccionario));
     }
 
     private Optional<Diccionario> diccionarioDe(String idioma) throws BuscadorDePalabrasException {

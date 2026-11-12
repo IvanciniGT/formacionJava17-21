@@ -24,7 +24,8 @@ public class GestorDeErroresRest {
 
     @ExceptionHandler(PalabraNoEncontradaException.class)
     public ResponseEntity<ErrorDTO> palabraNoEncontrada(PalabraNoEncontradaException e) {
-        return respuesta(HttpStatus.NOT_FOUND, CodigoDeError.PALABRA_NO_ENCONTRADA, e.getMessage());
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorDTO(CodigoDeError.PALABRA_NO_ENCONTRADA, e.getMessage(), e.getSugerencias()));
     }
 
     @ExceptionHandler(Exception.class)

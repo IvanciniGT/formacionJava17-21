@@ -43,6 +43,9 @@ class ProcesadorDePeticionesTest {
         @Override public Optional<String> obtenerPalabraDelUsuario() { return palabra; }
         @Override public void mostrarSignificadosDePalabra(String i, String p, List<Significado> s) { mostrado.add("significados " + i + " " + p + " " + s.size()); }
         @Override public void mostrarPalabraNoEncontrada(String i, String p) { mostrado.add("palabra no encontrada " + i + " " + p); }
+        @Override public void mostrarPalabraNoEncontrada(String i, String p, List<String> sugerencias) {
+            mostrado.add("palabra no encontrada " + i + " " + p + " sugerencias " + sugerencias);
+        }
         @Override public void mostrarIdiomaNoEncontrado(String i) { mostrado.add("idioma no encontrado " + i); }
         @Override public void mostrarErrorDeUsoDelPrograma() { mostrado.add("error de uso"); }
         @Override public void mostrarErrorGenerico(Exception e) { mostrado.add("error " + e.getMessage()); }
@@ -89,9 +92,9 @@ class ProcesadorDePeticionesTest {
     void unaPalabraQueNoExiste() {
         InterfazQueApunta interfaz = new InterfazQueApunta("ES", "patata");
 
-        int salida = procesar(interfaz, new BuscadorFijo(new PalabraNoEncontrada("patata", "ES")));
+        int salida = procesar(interfaz, new BuscadorFijo(new PalabraNoEncontrada("patata", "ES", List.of())));
 
-        assertEquals(List.of("palabra no encontrada ES patata"), interfaz.mostrado);
+        assertEquals(List.of("palabra no encontrada ES patata sugerencias []"), interfaz.mostrado);
         assertEquals(ProcesadorDePeticiones.TODO_BIEN, salida);
     }
 
@@ -120,7 +123,7 @@ class ProcesadorDePeticionesTest {
     void sinPalabraEsUnErrorDeUso() {
         InterfazQueApunta interfaz = new InterfazQueApunta("ES", null);
 
-        int salida = procesar(interfaz, new BuscadorFijo(new PalabraNoEncontrada("x", "ES")));
+        int salida = procesar(interfaz, new BuscadorFijo(new PalabraNoEncontrada("x", "ES", List.of())));
 
         assertEquals(List.of("error de uso"), interfaz.mostrado);
         assertEquals(ProcesadorDePeticiones.ERROR_DE_USO, salida);
@@ -135,5 +138,15 @@ class ProcesadorDePeticionesTest {
 
         assertEquals(List.of("error disco roto"), interfaz.mostrado);
         assertEquals(ProcesadorDePeticiones.ERROR_INTERNO, salida);
+    }
+
+    @Test
+    @DisplayName("Contexto: melon no existe y el servicio sugiere melón | Acción: procesar | Resultado esperado: palabra no encontrada con su sugerencia")
+    void unaPalabraQueNoExisteLlevaSusSugerencias() {
+        InterfazQueApunta interfaz = new InterfazQueApunta("ES", "melon");
+
+        procesar(interfaz, new BuscadorFijo(new PalabraNoEncontrada("melon", "ES", List.of("melón"))));
+
+        assertEquals(List.of("palabra no encontrada ES melon sugerencias [melón]"), interfaz.mostrado);
     }
 }
