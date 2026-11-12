@@ -85,16 +85,21 @@ idioma. Empieza siendo una app de consola con ficheros y acaba con un servidor c
 de datos y un frontal web, **sin tener que reescribir lo que ya funcionaba**: cada paso añade
 piezas nuevas y toca lo mínimo.
 
+Las piezas: el **repositorio** de diccionarios (lógica de persistencia, casi un SELECT), el
+**servicio** de búsqueda `BuscadorDePalabras` (lógica de negocio), la **interfaz de usuario**, los
+**diccionarios** de cada idioma y la **aplicación**, que lo ensambla todo.
+
 Cada paso está en su propia rama. Todas compilan, pasan sus pruebas y funcionan:
 
 | Rama | Qué trae | Java que se ve ahí |
 |---|---|---|
-| `v1.0-consola-ficheros` | La consola con ficheros, ya partida en piezas: API, implementación, interfaz de usuario y un jar por idioma | `Optional`, *streams* y lambdas, módulos (`module-info`), `ServiceLoader`, `record`, *text blocks* |
-| `v1.1-api-que-avisa-de-errores` | El API cambia sin romper a nadie, para poder avisar de los errores | métodos `default`, `@Deprecated(forRemoval)`, `sealed`, `switch` con patrones (Java 21) |
-| `v2.0-servidor-central` | Los diccionarios se van a un servidor REST, y la consola se elige entre ficheros o servidor sin tocar código | `java.net.http.HttpClient`, `ConcurrentHashMap.computeIfAbsent` |
-| `v3.0-bbdd` | El servidor guarda los diccionarios en una base de datos | Spring Data JPA, transacciones |
-| `v3.1-sugerencias` | Si la palabra no existe, sugiere las parecidas | `record` local, `parallelStream`, otra evolución del API |
-| `v4.0-frontal-web` | Un frontal web en Angular contra el mismo servidor | (TypeScript: la misma arquitectura en otro lenguaje) |
+| `v1.0-consola-ficheros` | La consola con ficheros, ya en componentes: repositorio, servicio con su resultado sellado, interfaz de usuario, un módulo por diccionario, y la aplicación con sus factorías | `Optional`, *streams* y lambdas, módulos (`module-info`), `ServiceLoader`, `record`, `sealed`, `switch` con patrones (Java 21), *text blocks* |
+| `v1.1-control-de-configuracion` | Palabras nuevas, erratas corregidas y otros mensajes de ayuda: cada cambio en su componente, y una versión nueva de la aplicación que los lleva | (ninguno: es control de configuración) |
+| `v1.2-repositorio-que-avisa-de-errores` | El repositorio aprende a avisar de los errores sin romper a nadie; el servicio lo absorbe y la consola ni se entera | métodos `default`, `@Deprecated(forRemoval)` |
+| `v2.0-servidor-central` | El servicio se va a un servidor y lo expone un controlador REST. Solo componentes nuevos: no se modifica nada de lo que había | `java.net.http.HttpClient`; las factorías convertidas en `@Bean` de Spring |
+| `v3.0-bbdd` | El servidor guarda los diccionarios en una base de datos, y un cargador la llena al arrancar | Spring Data JPA, transacciones |
+| `v3.1-sugerencias` | Si la palabra no existe, el servicio sugiere las parecidas, sin romper su API | `record` local, `parallelStream` |
+| `v4.0-frontal-web` | Un frontal web en Angular contra el mismo servidor, en paralelo con las apps de consola | (TypeScript: la misma arquitectura en otro lenguaje) |
 
 Cada rama tiene en `proyectos/diccionario/README.md` qué trae, cómo se ejecuta y qué cambia
 respecto a la anterior.
@@ -120,6 +125,9 @@ git switch main
 Y para ver qué cambió de un paso al siguiente:
 
 ```bash
-git diff v1.0-consola-ficheros v1.1-api-que-avisa-de-errores --stat
-git diff v1.0-consola-ficheros v1.1-api-que-avisa-de-errores -- proyectos/diccionario/diccionarios-api
+git diff v1.0-consola-ficheros v1.1-control-de-configuracion --stat
+git diff v1.1-control-de-configuracion v1.2-repositorio-que-avisa-de-errores -- proyectos/diccionario/diccionarios-api
 ```
+
+Para compilar y ejecutar no hace falta tener Maven instalado: cada rama lleva el Maven wrapper
+(`./mvnw`, o `mvnw.cmd` en Windows).
