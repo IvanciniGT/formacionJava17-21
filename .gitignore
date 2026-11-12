@@ -1,0 +1,22 @@
+# Maven
+target/
+
+# Node / Angular (frontal web)
+node_modules/
+dist/
+.angular/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+!proyectos/diccionario/diccionarios-web/.vscode/
+.classpath
+.project
+.settings/
+.factorypath
+bin/
+
+# Sistema
+.DS_Store
+Thumbs.db
