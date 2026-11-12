@@ -334,3 +334,81 @@ Y esos plugins tienen versiones. Cada versión de maven lleva por defecto un con
 
 En nuestro caso, necesitamos asegurar una versión MINIMA especialmente del plugin de compilación, que soporte java 21.
 Que tenáis un maven, no significa que ese maven funcione con nuestro proyecto... si tengo una versión viejita, funcionará bien con proyectos java 8, o java 11, pero no con java 21.
+
+
+Pruebas de caja negra: Las que diseñamos sin tener en cuenta la implementación concreta de un componente
+    Se centran en las entradas y salidas del componente, sin preocuparse de cómo se implementa internamente.
+    Son las que definimos a nivel del API
+
+    Tenemos un api de diccionarios.
+    Con una función llamada `boolean existe(Palabra palabra);`
+    Si yo llamo y tengo configurado un diccionario de es, que si que tiene la palabra melón, 
+    cuando ejecute esta función que debe devolver? TRUE
+    Eso depende de la implementación?
+        - Si tengo el diccionaario en BBDD o en ficheros ese comportamiento cambia? NO
+        - Es una prueba que verifica el comportamiento del API sin importar la implementación interna.
+        - Dicho de otra forma: CUALQUIER IMPLEMENTACION DEBE SUPERAR ESTAS PRUEBAS.
+      OJO, las pruebas las defino a nivel del API, pero su ejecución se hace a nivel de cada implementación. 
+
+Pruebas de caja blanca: Las que diseñamos teniendo ena cuenta la implementación concreta de un componente
+    Se centran en la estructura interna del componente, verificando caminos específicos del código.
+    Son las que definimos a nivel de implementación
+
+    Por ejemplo, si quiero probar la función `existe` del diccionario, puedo diseñar pruebas que verifiquen caminos específicos del código, como:Imaginad que implemento nuestro paquete de diccionarios contra bbdd.
+    Y la primera vez que pregunto por una palabra se hace la query.. pero además de devolverme el resultado, ese resultado es guardado localmente en una caché.
+    Para que la siguiente vez que se pregunte por la palabra no sea necesario hacer la query a la BBDD y se pueda obtener el resultado directamente de la caché.
+
+    La prueba de caja negra está probando la caché? NO.. solo preguntaba por la palabra melón 1 vez.
+    Para probar la caché, necesitaríamos diseñar una prueba que consulte la misma palabra más de una vez y verifique que la segunda consulta no realiza la query a la BBDD, sino que obtiene el resultado directamente de la caché.
+
+    Todas las impleemntaciones de nuestro módulo de diccionarios deben superar esta prueba?
+        - NO, solo las que implementen la caché.
+        - Esta prueba DEPENDE DE LA IMPLEMENTACION. Y se define dentro de ella... es una prueba de caja blanca!
+
+
+---
+                                    LOCAL
+-------------------------------------------------------------------------------------------------------------
+app-consola-integrada -> api-servicio -> impl-servicio-local -> api-diccionarios -> impl-diccionarios-fichero
+
+
+        LOCAL                                                       SERVIDOR
+------------------------------------------------------------- ---------------------------------------------------------------------------------------------------------------
+app-consola-remoto -> api-servicio                      http                   api-servicio -> impl-servicio-local -> api-diccionarios -> impl-diccionarios-bbdd
+                                 -> impl-servicio-servidor ->  -> contrrolador http ->
+                                 Traducir el api a                  Traducir 
+                                 peticiones http                   peticiones http al api java
+
+                                                                    El controlador le monto en una app de backend dentro de un tomcat
+
+                    app-web-angular ----------------> http
+
+```java
+String multilineaEnJava = "Esta es la primera línea\n" +
+                           "Esta es la segunda línea\n" +
+                           "Esta es la tercera línea";
+
+String nuevoOperadorTextosMultilinea = """
+                                   Esta es la primera línea
+                                   Esta es la segunda línea
+                                   Esta es la tercera línea
+                                   """;
+```
+
+
+Antiguamente los hilos en Java correspondían con Hilos LOGICOS a nivel de SO.
+Abrir un hilo de ejecución en un proceso (FORK) implicaba crear un nuevo hilo lógico que el sistema operativo gestionaba, y eso es muy costoso en términos de recursos y tiempo de creación.
+
+En una app java podíamos abrir 100, 20, 300 hilos, pero cada uno de ellos consumía recursos significativos y el tiempo de creación era elevado.
+Java o no Java... esto es algo de SO.
+
+En Java 21 aparecen los hilos virtuales (Virtual Threads), que permiten crear miles de hilos de manera eficiente, ya que no están directamente ligados a los hilos del sistema operativo y su gestión es mucho más ligera.
+Lo que se hace es una multiplexación de los hilos virtuales sobre un número reducido de hilos del sistema operativo, lo que permite manejar miles de hilos de manera eficiente sin el coste asociado a los hilos tradicionales.
+
+Esto permite abrir millones de hilos virtuales sin que el sistema operativo se vea saturado, lo que facilita la concurrencia masiva en aplicaciones Java modernas.
+Es más o menos el concepto dque hay en JS con los event loops y la ejecución asíncrona, donde no se bloquea el hilo principal y se pueden manejar muchas tareas concurrentes de manera eficiente. En Kotlin también existe: las corutinas, que permiten manejar la concurrencia de manera eficiente sin bloquear hilos del sistema operativo.
+
+Es eso traído a Java con los hilos virtuales, que permiten manejar la concurrencia de manera eficiente sin depender directamente de los hilos del sistema operativo.
+Pero muy bien hecho.
+Es transparente totalmente.. solo es algo que activo a nivel de la JVM al crear los hilos.
+Por ejemplo, en Java 21 se puede usar `Thread.ofVirtual().start(() -> { ... })` para crear un hilo virtual de manera sencilla y eficiente.
