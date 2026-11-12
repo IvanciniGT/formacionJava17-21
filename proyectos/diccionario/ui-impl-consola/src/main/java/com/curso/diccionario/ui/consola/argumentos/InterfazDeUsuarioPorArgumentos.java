@@ -58,13 +58,17 @@ public class InterfazDeUsuarioPorArgumentos implements InterfazDeUsuario {
         // Java 15: bloque de texto (triple comilla), un String de varias líneas sin \n ni +.
         salida.println("""
                 Faltan argumentos.
-                La forma correcta de invocar el programa es:
+                Uso:
 
                     $ buscarPalabra <IDIOMA> <PALABRA>
 
-                Ejemplo:
+                El idioma es su código (ES, EN...), en mayúsculas o en minúsculas. La palabra
+                se encuentra aunque no lleve sus acentos ni sus mayúsculas: "Atun" encuentra "atún".
 
-                    $ buscarPalabra ES melón""");
+                Ejemplos:
+
+                    $ buscarPalabra es melón
+                    $ buscarPalabra ES MEMBRILLO""");
     }
 
     @Override

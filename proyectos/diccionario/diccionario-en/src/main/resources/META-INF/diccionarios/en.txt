@@ -1,7 +1,7 @@
-melon=A large round fruit with swet juicy flesh.(A slyce of melon)
+melon=A large round fruit with sweet juicy flesh.(A slice of melon)
 pear=The fruit of the pear tree.
 bank=An organisation that keeps money and lends it.(I asked the bank for a mortgage)|The land along the side of a river.(We sat on the river bank)
-cat=A small domestik feline.(The cat is sleeping on the sofa)
+cat=A small domestic feline.(The cat is sleeping on the sofa)
 leaf=A flat green part of a plant.(The leaves fall in autumn)|A sheet of paper in a book.(She turned the leaf)
 saw=A tool with a toothed blade for cutting.(Cut the board with the saw)
 dafive=A person who never finishes what they start.(The dafive from my village is famous)(Yesterday I saw a dafive at the market)

@@ -13,7 +13,7 @@
          Versiona a su ritmo: corregir una definición es una versión del diccionario, no de la aplicación.
          Los ficheros los genera herramientas/GeneradorDeDiccionarios.java. -->
     <artifactId>diccionario-en</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1</version>
     <name>Diccionario - inglés</name>
 
     <build>

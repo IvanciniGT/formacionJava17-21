@@ -1,9 +1,9 @@
-# Diccionario · v1.0: Consola con ficheros
+# Diccionario · v1.1: Control de configuración
 
-> Rama `v1.0-consola-ficheros`. El proyecto evoluciona rama a rama, y cada una compila, pasa sus
+> Rama `v1.1-control-de-configuracion`. El proyecto evoluciona rama a rama, y cada una compila, pasa sus
 > pruebas y funciona:
 >
-> **`v1.0-consola-ficheros`** ← estás aquí → `v1.1-control-de-configuracion` → `v1.2-repositorio-que-avisa-de-errores` → `v2.0-servidor-central` → `v3.0-bbdd` → `v3.1-sugerencias` → `v4.0-frontal-web`
+> `v1.0-consola-ficheros` → **`v1.1-control-de-configuracion`** ← estás aquí → `v1.2-repositorio-que-avisa-de-errores` → `v2.0-servidor-central` → `v3.0-bbdd` → `v3.1-sugerencias` → `v4.0-frontal-web`
 
 Busca una palabra en el diccionario de un idioma y muestra sus significados con ejemplos.
 
@@ -19,34 +19,22 @@ La palabra melón existe en el idioma ES y tiene los siguientes significados:
 
 ## Qué trae esta versión
 
-La primera versión que funciona: una app de consola con los diccionarios en ficheros. Y ya en
-componentes desacoplados, para que cuando lleguen cambios (y llegarán) no haya que **modificar ni
-una línea de código**: crear piezas nuevas, quitar las que sobren, pero no tocar lo que funciona.
+**Control de configuración.** Llegan cambios, y cada uno se queda en su componente:
 
-- **El repositorio** (`diccionarios-api` + `diccionarios-impl-ficheros`): LÓGICA DE PERSISTENCIA.
-  Funciones de muy bajo nivel: `getDiccionario(idioma)`, `getSignificados(palabra)`, `getPalabras()`.
-  `Optional` en lugar de `null`. Con sus **pruebas de contrato**: lo que *cualquier* implementación
-  tiene que cumplir.
-- **El servicio de búsqueda** (`diccionarios-service-api` + `-impl`): LÓGICA DE NEGOCIO, no un
-  agregado del repositorio. `buscarExacta` y `buscarIgnorandoMayusculasYAcentos` (*MEMBRILLO* →
-  *membrillo*, *Atun* → *atún*; pero *ano* no es *año*). Devuelve tres resultados distintos, y no un
-  `Optional` (que no diría si falta la palabra o el idioma): un **`sealed interface
-  ResultadoDeBusqueda permits PalabraEncontrada, PalabraNoEncontrada, IdiomaNoSoportado`**, tres
-  `record`. Un contrato cerrado (Liskov).
-- **La interfaz de usuario, aparte** (`ui-api` / `ui-impl-consola`).
-- **Los diccionarios, cada uno su módulo** (`diccionario-es`, `diccionario-en`): independientes entre
-  sí y del resto. Los mantienen lingüistas, no desarrolladores.
-- **La aplicación**, el ensamblado: `diccionarios-app-consola` es el código (el `main`, las
-  **factorías** y el procesador, que trata el resultado con un **`switch` con patrones de Java 21**,
-  exhaustivo y sin `default`), y `diccionarios-app-consola-ficheros` es lo que se entrega: un pom sin
-  código que dice qué piezas, y en qué versión, lleva.
-- Las factorías no hacen el `new` de nada: se lo piden al **`ServiceLoader`** (`uses` / `provides` en
-  `module-info.java`), que da lo que haya en el module path.
+- Nuevas palabras en español: `diccionario-es` **1.1.0** (*membrillo*, *atún*, *sandía*...).
+- Erratas en las definiciones de inglés: `diccionario-en` **1.0.1**.
+- Otros mensajes de ayuda en la consola: `ui-impl-consola` **1.0.1**.
 
-Y funciona. Pero se instala en cada máquina: cada errata en un diccionario, cada cambio, obliga a
-que todos los usuarios actualicen.
+Y una versión nueva de la aplicación, `diccionarios-app-consola-ficheros` **1.1.0**, que solo dice
+que ahora lleva esas versiones. El repositorio, el servicio y el código de la app no se tocan.
 
-Siguiente: `v1.1-control-de-configuracion`.
+```bash
+git diff v1.0-consola-ficheros v1.1-control-de-configuracion --stat
+```
+
+Datos, un texto de ayuda y poms: ni una línea de lógica.
+
+Siguiente: `v1.2-repositorio-que-avisa-de-errores`.
 
 ## Requisitos
 
@@ -78,14 +66,14 @@ columna dice qué ha cambiado respecto a la rama anterior.
 |---|---|---|---|
 | `diccionarios-api` | 1.0.0 |  | El REPOSITORIO (lógica de persistencia): `SuministradorDeDiccionarios`, `Diccionario`, `Significado`. Funciones de bajo nivel, casi un SELECT. Con sus pruebas de contrato (`test-jar`) |
 | `diccionarios-impl-ficheros` | 1.0.0 |  | El repositorio en ficheros: lee los `.txt` de los jars de idioma |
-| `diccionario-es` | 1.0.0 |  | Solo datos: el diccionario de español y su índice |
-| `diccionario-en` | 1.0.0 |  | Solo datos: el diccionario de inglés y su índice |
+| `diccionario-es` | 1.1.0 | **1.0.0 → 1.1.0** | Solo datos: el diccionario de español y su índice |
+| `diccionario-en` | 1.0.1 | **1.0.0 → 1.0.1** | Solo datos: el diccionario de inglés y su índice |
 | `diccionarios-service-api` | 1.0.0 |  | El SERVICIO (lógica de negocio): `BuscadorDePalabras` y su resultado sellado `ResultadoDeBusqueda` (`PalabraEncontrada`, `PalabraNoEncontrada`, `IdiomaNoSoportado`) |
 | `diccionarios-service-impl` | 1.0.0 |  | El servicio de verdad, sobre el repositorio. Con las pruebas de contrato del servicio (`test-jar`) |
 | `ui-api` | 1.0.0 |  | La interfaz de usuario: todo lo que la app le dice o le pide al usuario |
-| `ui-impl-consola` | 1.0.0 |  | La de línea de comandos: lee idioma y palabra de los argumentos |
+| `ui-impl-consola` | 1.0.1 | **1.0.0 → 1.0.1** | La de línea de comandos: lee idioma y palabra de los argumentos |
 | `diccionarios-app-consola` | 1.0.0 |  | El código de la app de consola: el `main`, las **factorías** y `ProcesadorDePeticiones`, que expone el servicio por la línea de comandos |
-| `diccionarios-app-consola-ficheros` | 1.0.0 |  | LA APLICACIÓN, el ensamblado: un pom sin código que dice qué piezas lleva. Todo en local, con ficheros |
+| `diccionarios-app-consola-ficheros` | 1.1.0 | **1.0.0 → 1.1.0** | LA APLICACIÓN, el ensamblado: un pom sin código que dice qué piezas lleva. Todo en local, con ficheros |
 
 ## Comandos
 
@@ -112,7 +100,7 @@ Maven instalado: `./mvnw` (en Windows, `mvnw.cmd`) se baja la versión que toca 
 Con `java` directamente (después de `./mvnw package`), con las piezas que dice su pom:
 
 ```bash
-java --module-path diccionarios-api/target/diccionarios-api-1.0.0.jar:diccionarios-service-api/target/diccionarios-service-api-1.0.0.jar:diccionarios-service-impl/target/diccionarios-service-impl-1.0.0.jar:ui-api/target/ui-api-1.0.0.jar:ui-impl-consola/target/ui-impl-consola-1.0.0.jar:diccionarios-impl-ficheros/target/diccionarios-impl-ficheros-1.0.0.jar:diccionario-es/target/diccionario-es-1.0.0.jar:diccionario-en/target/diccionario-en-1.0.0.jar:diccionarios-app-consola/target/diccionarios-app-consola-1.0.0.jar \
+java --module-path diccionarios-api/target/diccionarios-api-1.0.0.jar:diccionarios-service-api/target/diccionarios-service-api-1.0.0.jar:diccionarios-service-impl/target/diccionarios-service-impl-1.0.0.jar:ui-api/target/ui-api-1.0.0.jar:ui-impl-consola/target/ui-impl-consola-1.0.1.jar:diccionarios-impl-ficheros/target/diccionarios-impl-ficheros-1.0.0.jar:diccionario-es/target/diccionario-es-1.1.0.jar:diccionario-en/target/diccionario-en-1.0.1.jar:diccionarios-app-consola/target/diccionarios-app-consola-1.0.0.jar \
      --add-modules ALL-MODULE-PATH \
      --module app/com.curso.diccionario.app.consola.BuscarPalabra es MEMBRILLO
 ```
