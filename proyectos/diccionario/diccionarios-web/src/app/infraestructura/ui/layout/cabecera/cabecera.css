@@ -1,0 +1,39 @@
+.cabecera {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.25rem 0;
+}
+
+.marca {
+  display: inline-flex;
+  align-items: center;
+  gap: .625rem;
+  text-decoration: none;
+  color: inherit;
+}
+
+.glifo {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 9px;
+  background: var(--acento);
+  color: var(--sobre-acento);
+  font-weight: 700;
+  font-size: 1rem;
+}
+
+.nombre {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  letter-spacing: -.01em;
+}
+
+.marca:focus-visible {
+  outline: 2px solid var(--acento);
+  outline-offset: 4px;
+  border-radius: 6px;
+}

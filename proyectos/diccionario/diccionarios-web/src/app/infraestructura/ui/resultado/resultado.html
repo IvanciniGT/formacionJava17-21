@@ -1,0 +1,36 @@
+@let e = estado();
+
+@switch (e.tipo) {
+  @case ('sin-buscar') {
+    <app-cargando mensaje="Preparando…" />
+  }
+
+  @case ('buscando') {
+    <app-cabecera-de-resultado [palabra]="palabra()" [idioma]="idioma()" />
+    <app-cargando />
+  }
+
+  @case ('resuelta') {
+    <app-cabecera-de-resultado [palabra]="palabra()" [idioma]="idioma()" />
+
+    @switch (e.respuesta.tipo) {
+      @case ('palabra-encontrada') {
+        <app-lista-de-significados [significados]="e.respuesta.significados" />
+      }
+      @case ('palabra-no-encontrada') {
+        @if (e.respuesta.sugerencias.length) {
+          <app-lista-de-sugerencias
+            [palabra]="e.respuesta.palabra"
+            [idioma]="idioma()"
+            [sugerencias]="e.respuesta.sugerencias"
+          />
+        } @else {
+          <app-sin-sugerencias [palabra]="e.respuesta.palabra" />
+        }
+      }
+      @case ('error-al-obtener-palabra') {
+        <app-mensaje-de-error [mensaje]="e.respuesta.mensaje" />
+      }
+    }
+  }
+}

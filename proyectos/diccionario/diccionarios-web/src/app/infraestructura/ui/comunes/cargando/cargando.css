@@ -1,0 +1,8 @@
+.caja {
+  display: grid;
+  justify-items: center;
+  gap: 1rem;
+  padding: 4rem 1rem;
+  color: var(--tenue);
+}
+p { margin: 0; font-size: .9375rem; }

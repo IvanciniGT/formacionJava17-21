@@ -1,0 +1,11 @@
+<div class="aviso">
+  <p><strong>{{ palabra() }}</strong> no está en el diccionario.</p>
+  <p class="pista">¿Querías decir alguna de estas?</p>
+</div>
+<ul class="sugerencias">
+  @for (sugerencia of sugerencias(); track sugerencia) {
+    <li>
+      <a [routerLink]="['/', idioma(), sugerencia]">{{ sugerencia }}</a>
+    </li>
+  }
+</ul>

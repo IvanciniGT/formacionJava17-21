@@ -1,0 +1,30 @@
+.titulo {
+  margin: 0 0 1rem;
+  font-size: .75rem;
+  font-weight: 600;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--tenue);
+}
+.lista { margin: 0; padding: 0; list-style: none; display: grid; gap: .75rem; }
+li {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem 1.5rem;
+  border-radius: 14px;
+  background: var(--tarjeta);
+  border: 1px solid var(--borde);
+}
+.numero {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  font-size: .75rem;
+  font-weight: 600;
+  background: var(--acento-suave);
+  color: var(--acento);
+}
+p { margin: 0; line-height: 1.6; }

@@ -1,0 +1,21 @@
+mat-button-toggle-group {
+  /* Material trae su propio color para el boton seleccionado, de su paleta y no de la
+     nuestra: sin esto sale un azul lavanda que choca con el acento calido de la aplicacion.
+     Se sobreescriben sus tokens para que herede nuestros colores. */
+  --mat-button-toggle-selected-state-background-color: var(--acento-suave);
+  --mat-button-toggle-selected-state-text-color: var(--acento);
+  --mat-button-toggle-background-color: transparent;
+  --mat-button-toggle-text-color: var(--tenue);
+  --mat-button-toggle-divider-color: var(--borde);
+  --mat-button-toggle-height: 36px;
+
+  border-radius: 999px;
+  overflow: hidden;
+  border-color: var(--borde);
+}
+
+mat-icon {
+  font-size: 1.125rem;
+  width: 1.125rem;
+  height: 1.125rem;
+}

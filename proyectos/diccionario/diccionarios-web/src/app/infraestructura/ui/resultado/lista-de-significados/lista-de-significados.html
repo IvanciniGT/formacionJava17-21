@@ -1,0 +1,20 @@
+<h2 class="titulo">
+  {{ significados().length === 1 ? 'Significado' : 'Significados' }}
+</h2>
+<ol class="lista">
+  @for (significado of significados(); track $index) {
+    <li>
+      <span class="numero" aria-hidden="true">{{ $index + 1 }}</span>
+      <div>
+        <p>{{ significado.texto }}</p>
+        @if (significado.ejemplos.length) {
+          <ul class="ejemplos">
+            @for (ejemplo of significado.ejemplos; track $index) {
+              <li>{{ ejemplo }}</li>
+            }
+          </ul>
+        }
+      </div>
+    </li>
+  }
+</ol>

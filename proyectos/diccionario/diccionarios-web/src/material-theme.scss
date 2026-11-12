@@ -1,0 +1,31 @@
+// Tema de Angular Material.
+//
+// mat.theme() genera las variables --mat-sys-* con la funcion CSS light-dark(), que resuelve
+// segun el `color-scheme` COMPUTADO del elemento. Por eso aqui NO se fija ningun color-scheme:
+// lo pone styles.css en :root segun el atributo data-tema que escribe ServicioDeTema.
+//
+// Si aqui se dejara `color-scheme: light` en el body -como venia por defecto- todo Material se
+// quedaria en claro para siempre, incluidos los paneles que se pintan en el overlay del CDK
+// (el desplegable del selector de idioma), que cuelgan del body y no del componente.
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme((
+    // Paleta calida, para que Material acompane al acento terracota de la aplicacion
+    // en lugar de imponer su azul.
+    color: (
+      primary: mat.$orange-palette,
+      tertiary: mat.$orange-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  // Ni color-scheme, ni colores, ni tipografia: de eso se encarga styles.css, que es quien
+  // conoce los tokens de la aplicacion.
+  margin: 0;
+  height: 100%;
+}

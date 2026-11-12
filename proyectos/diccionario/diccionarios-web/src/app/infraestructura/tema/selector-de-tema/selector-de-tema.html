@@ -1,0 +1,16 @@
+<mat-button-toggle-group
+  hideSingleSelectionIndicator
+  aria-label="Tema de la interfaz"
+  [value]="tema()"
+  (valueChange)="cambiar($event)"
+>
+  <mat-button-toggle value="claro" aria-label="Tema claro" matTooltip="Claro">
+    <mat-icon aria-hidden="true">light_mode</mat-icon>
+  </mat-button-toggle>
+  <mat-button-toggle value="sistema" aria-label="Según el sistema">
+    <mat-icon aria-hidden="true">computer</mat-icon>
+  </mat-button-toggle>
+  <mat-button-toggle value="oscuro" aria-label="Tema oscuro">
+    <mat-icon aria-hidden="true">dark_mode</mat-icon>
+  </mat-button-toggle>
+</mat-button-toggle-group>

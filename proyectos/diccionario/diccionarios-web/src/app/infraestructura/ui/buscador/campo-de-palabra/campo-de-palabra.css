@@ -1,0 +1,3 @@
+.fila { display: flex; gap: .75rem; align-items: center; }
+mat-form-field { flex: 1; }
+button { flex: none; }

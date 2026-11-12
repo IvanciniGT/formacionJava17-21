@@ -1,0 +1,68 @@
+/* ---------------------------------------------------------------------------
+   Tokens de tema.
+
+   El servicio de tema escribe data-tema="claro" | "oscuro" en el <html>, asi que
+   aqui no hace falta ningun media query: la eleccion del usuario y la del sistema
+   acaban las dos en el mismo atributo.
+   --------------------------------------------------------------------------- */
+
+:root,
+[data-tema='claro'] {
+  --fondo:         #fbfaf9;
+  --texto:         #1c1b1a;
+  --tenue:         #6f6b66;
+  --tarjeta:       #ffffff;
+  --borde:         #e7e3de;
+  --acento:        #9a3412;
+  --acento-suave:  #fdf0e7;
+  --sobre-acento:  #ffffff;
+  --error-fondo:   #fdecea;
+  --error-texto:   #8c2f24;
+  color-scheme: light;
+}
+
+[data-tema='oscuro'] {
+  --fondo:         #14120f;
+  --texto:         #edeae6;
+  --tenue:         #9c948b;
+  --tarjeta:       #1e1b18;
+  --borde:         #322d28;
+  --acento:        #f6a06a;
+  --acento-suave:  #2b1d14;
+  --sobre-acento:  #241206;
+  --error-fondo:   #331916;
+  --error-texto:   #f3b0a5;
+  color-scheme: dark;
+}
+
+/* --------------------------------------------------------------------------- */
+
+* { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .2s ease, color .2s ease;
+}
+
+::selection {
+  background: var(--acento-suave);
+  color: var(--acento);
+}
+
+/* Angular Material hereda nuestros tokens en lugar de imponer los suyos. */
+:root {
+  --mat-sys-primary: var(--acento);
+  --mat-sys-on-primary: var(--sobre-acento);
+  --mat-sys-surface: var(--tarjeta);
+  --mat-sys-on-surface: var(--texto);
+  --mat-sys-outline: var(--borde);
+  --mat-sys-on-surface-variant: var(--tenue);
+}

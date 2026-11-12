@@ -1,9 +1,9 @@
-# Diccionario · v3.1: Palabras sugeridas
+# Diccionario · v4.0: Frontal web
 
-> Rama `v3.1-sugerencias`. El proyecto evoluciona rama a rama, y cada una compila, pasa sus
+> Rama `v4.0-frontal-web`. El proyecto evoluciona rama a rama, y cada una compila, pasa sus
 > pruebas y funciona:
 >
-> `v1.0-consola-ficheros` → `v1.1-control-de-configuracion` → `v1.2-repositorio-que-avisa-de-errores` → `v2.0-servidor-central` → `v3.0-bbdd` → **`v3.1-sugerencias`** ← estás aquí → `v4.0-frontal-web`
+> `v1.0-consola-ficheros` → `v1.1-control-de-configuracion` → `v1.2-repositorio-que-avisa-de-errores` → `v2.0-servidor-central` → `v3.0-bbdd` → `v3.1-sugerencias` → **`v4.0-frontal-web`** ← estás aquí
 
 Busca una palabra en el diccionario de un idioma y muestra sus significados con ejemplos.
 
@@ -19,34 +19,24 @@ La palabra melón existe en el idioma ES y tiene los siguientes significados:
 
 ## Qué trae esta versión
 
-Un cambio **funcional**: si la palabra no existe, el sistema sugiere las parecidas.
+Un frontal **web**, en Angular, en paralelo con las apps de consola (no se quitan: no son
+incompatibles). Contra el mismo servidor, que no cambia ni una línea.
 
-```
-$ buscarPalabra es membrilo
-La palabra membrilo NO existe en el idioma es.
-Quizás quisiste decir: membrillo
-```
+- **`diccionarios-web`**, Angular 21, con la misma arquitectura en otro lenguaje: un puerto, un
+  adaptador REST, uniones discriminadas con `switch` exhaustivo como el `sealed` de Java.
+- **Sus tipos salen del contrato Java**: `npm run contrato` genera los DTO desde la OpenAPI de
+  `diccionarios-controlador-rest-api`. El DRY de la `v2.0`, llegando hasta el frontal.
+- Busca ignorando mayúsculas y acentos, y enseña las sugerencias que llegan en el 404, con enlace.
+- Su `ng build` deja HTML, JS y CSS que se pueden servir desde cualquier servidor web (también
+  desde el propio `diccionarios-app-servidor`, como contenido estático).
 
-Toca un montón de componentes, pero está muy claro qué cambia en cada uno:
-
-- **API del servicio 1.1.0**: ningún método nuevo; solo crece una clase de transporte de datos,
-  `PalabraNoEncontrada`, que gana sus sugerencias. Con cuidado de no romper a nadie: su constructor
-  de antes sigue existiendo, así que es un **minor**.
-- **Las dos implementaciones del servicio**: la local (1.2.0) calcula las parecidas con
-  **Levenshtein**, que es lógica de negocio (`PalabrasSimilares`, con un `record` local y
-  `parallelStream`); la remota (1.1.0) las lee de la respuesta.
-- **El controlador y su API** (1.1.0): las sugerencias viajan **en el cuerpo del 404** de palabra no
-  encontrada. Un campo nuevo en una respuesta no rompe a quien ya la leía.
-- **La interfaz de usuario** (`ui-api` y `ui-impl-consola` 1.1.0) las enseña.
-
-El repositorio no cambia: le basta con la lista de palabras que ya daba.
-
-Siguiente: `v4.0-frontal-web`.
+Detalle en [diccionarios-web/README.md](diccionarios-web/README.md).
 
 ## Requisitos
 
 - JDK 21 o superior (se compila con `release 21`; probado con JDK 25).
 - Maven no hace falta: va el wrapper (`./mvnw`).
+- Node.js 20+ y npm, para el frontal web.
 
 ## Arquitectura
 
@@ -70,6 +60,7 @@ flowchart LR
     SR -- HTTP --> CTRL
     SR --> RAPI
     CTRL --> RAPI
+    WEB[diccionarios-web<br/>Angular] -- HTTP --> CTRL
 ```
 
 Y en paralelo, `diccionarios-app-consola-ficheros`, todo en la máquina del usuario, como en la `v1.0`.
@@ -85,19 +76,20 @@ columna dice qué ha cambiado respecto a la rama anterior.
 | `diccionarios-impl-ficheros` | 1.1.0 |  | El repositorio en ficheros: lee los `.txt` de los jars de idioma |
 | `diccionario-es` | 1.1.0 |  | Solo datos: el diccionario de español y su índice |
 | `diccionario-en` | 1.0.1 |  | Solo datos: el diccionario de inglés y su índice |
-| `diccionarios-service-api` | 1.1.0 | **1.0.0 → 1.1.0** | El SERVICIO (lógica de negocio): `BuscadorDePalabras` y su resultado sellado `ResultadoDeBusqueda` (`PalabraEncontrada`, `PalabraNoEncontrada`, `IdiomaNoSoportado`) |
-| `diccionarios-service-impl` | 1.2.0 | **1.1.0 → 1.2.0** | El servicio de verdad, sobre el repositorio. Con las pruebas de contrato del servicio (`test-jar`) |
-| `ui-api` | 1.1.0 | **1.0.0 → 1.1.0** | La interfaz de usuario: todo lo que la app le dice o le pide al usuario |
-| `ui-impl-consola` | 1.1.0 | **1.0.1 → 1.1.0** | La de línea de comandos: lee idioma y palabra de los argumentos |
-| `diccionarios-app-consola` | 1.1.0 | **1.0.0 → 1.1.0** | El código de la app de consola: el `main`, las **factorías** y `ProcesadorDePeticiones`, que expone el servicio por la línea de comandos |
-| `diccionarios-app-consola-ficheros` | 1.3.0 | **1.2.0 → 1.3.0** | LA APLICACIÓN, el ensamblado: un pom sin código que dice qué piezas lleva. Todo en local, con ficheros |
-| `diccionarios-controlador-rest-api` | 1.1.0 | **1.0.0 → 1.1.0** | El contrato HTTP, independiente: rutas, DTO, errores, y la especificación OpenAPI que se genera de él |
-| `diccionarios-controlador-rest` | 1.1.0 | **1.0.0 → 1.1.0** | El `@RestController`: expone el servicio por HTTP |
-| `diccionarios-service-impl-rest` | 1.1.0 | **1.0.0 → 1.1.0** | Otro servicio... que se lo pregunta al servidor por HTTP (`java.net.http`): traduce llamadas al API Java en peticiones REST |
-| `diccionarios-app-consola-servidor` | 1.1.0 | **1.0.0 → 1.1.0** | Otra aplicación, otro ensamblado del mismo código: la consola contra el servidor |
-| `diccionarios-app-servidor` | 2.1.0 | **2.0.0 → 2.1.0** | La aplicación del servidor (Spring Boot): las factorías convertidas en `@Bean` |
+| `diccionarios-service-api` | 1.1.0 |  | El SERVICIO (lógica de negocio): `BuscadorDePalabras` y su resultado sellado `ResultadoDeBusqueda` (`PalabraEncontrada`, `PalabraNoEncontrada`, `IdiomaNoSoportado`) |
+| `diccionarios-service-impl` | 1.2.0 |  | El servicio de verdad, sobre el repositorio. Con las pruebas de contrato del servicio (`test-jar`) |
+| `ui-api` | 1.1.0 |  | La interfaz de usuario: todo lo que la app le dice o le pide al usuario |
+| `ui-impl-consola` | 1.1.0 |  | La de línea de comandos: lee idioma y palabra de los argumentos |
+| `diccionarios-app-consola` | 1.1.0 |  | El código de la app de consola: el `main`, las **factorías** y `ProcesadorDePeticiones`, que expone el servicio por la línea de comandos |
+| `diccionarios-app-consola-ficheros` | 1.3.0 |  | LA APLICACIÓN, el ensamblado: un pom sin código que dice qué piezas lleva. Todo en local, con ficheros |
+| `diccionarios-controlador-rest-api` | 1.1.0 |  | El contrato HTTP, independiente: rutas, DTO, errores, y la especificación OpenAPI que se genera de él |
+| `diccionarios-controlador-rest` | 1.1.0 |  | El `@RestController`: expone el servicio por HTTP |
+| `diccionarios-service-impl-rest` | 1.1.0 |  | Otro servicio... que se lo pregunta al servidor por HTTP (`java.net.http`): traduce llamadas al API Java en peticiones REST |
+| `diccionarios-app-consola-servidor` | 1.1.0 |  | Otra aplicación, otro ensamblado del mismo código: la consola contra el servidor |
+| `diccionarios-app-servidor` | 2.1.0 |  | La aplicación del servidor (Spring Boot): las factorías convertidas en `@Bean` |
 | `diccionarios-impl-bbdd` | 1.0.0 |  | El repositorio en BBDD (Spring Data JPA); se enchufa solo por autoconfiguración |
 | `cargador-de-bbdd-palabras` | 1.0.0 |  | Llena la BBDD con los jars de idioma al arrancar el servidor, si han cambiado (huella SHA-256) |
+| `diccionarios-web` | 1.0.0 | **nuevo** | El frontal web, Angular 21: otro cliente más del mismo servidor |
 
 ## Comandos
 
@@ -179,6 +171,16 @@ java --module-path diccionarios-api/target/diccionarios-api-1.1.0.jar:diccionari
 
 El servidor, en `DICCIONARIOS_SERVIDOR` (por defecto `http://localhost:8080`).
 
+### El frontal web
+
+Con el servidor arrancado:
+
+```bash
+cd diccionarios-web
+npm install
+npm start          # http://localhost:4200
+```
+
 ## Los diccionarios
 
 Un jar por idioma (`diccionario-es`, `diccionario-en`), con dos ficheros en `META-INF/diccionarios/`:
@@ -224,6 +226,7 @@ Y un major que no viene de ningún API: `diccionarios-app-servidor` 2.0.0, porqu
 | `diccionarios-controlador-rest` | Las URLs, status y JSON del controlador con `@WebMvcTest`, con un servicio falso |
 | `diccionarios-app-servidor` | Que arranca y sirve los idiomas; y **el servicio remoto cumple el contrato del servicio contra este servidor de verdad** |
 | `ui-impl-consola`, `diccionarios-app-consola` | Los mensajes de la consola; el procesador con un servicio y una interfaz de usuario falsos, sin capturar la consola |
+| `diccionarios-web` (`npm test`) | El mapeador (los dos 404, las sugerencias del cuerpo), el adaptador con `HttpTestingController` y el caso de uso con un suministrador falso |
 
 ## Limitaciones conocidas
 

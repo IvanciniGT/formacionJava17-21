@@ -1,0 +1,7 @@
+@if (src(); as ruta) {
+  <img class="bandera" [src]="ruta" [alt]="alt()" [style.width.px]="tam()" />
+} @else {
+  <span class="sin-bandera" [style.width.px]="tam()" [attr.aria-label]="alt() || null">
+    {{ codigo().toUpperCase() }}
+  </span>
+}

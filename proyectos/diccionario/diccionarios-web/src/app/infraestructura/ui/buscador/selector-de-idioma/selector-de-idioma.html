@@ -1,0 +1,17 @@
+<mat-form-field appearance="outline" subscriptSizing="dynamic">
+  <mat-label>Idioma</mat-label>
+  <mat-select
+    [value]="seleccionado()"
+    (valueChange)="cambiado.emit($event)"
+    [disabled]="idiomas().length === 0"
+  >
+    @for (idioma of idiomas(); track idioma.codigo) {
+      <mat-option [value]="idioma.codigo">
+        <span class="opcion">
+          <app-bandera-de-idioma [codigo]="idioma.codigo" [conTexto]="true" [tam]="22" />
+          {{ nombre(idioma.codigo) }}
+        </span>
+      </mat-option>
+    }
+  </mat-select>
+</mat-form-field>

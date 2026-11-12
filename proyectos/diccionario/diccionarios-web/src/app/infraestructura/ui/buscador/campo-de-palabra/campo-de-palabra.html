@@ -1,0 +1,22 @@
+<form class="fila" (ngSubmit)="enviar()">
+  <mat-form-field appearance="outline" subscriptSizing="dynamic">
+    <mat-label>Palabra</mat-label>
+    <input
+      matInput
+      name="palabra"
+      autocomplete="off"
+      spellcheck="false"
+      [ngModel]="texto()"
+      (ngModelChange)="texto.set($event)"
+      placeholder="Escribe una palabra…"
+    />
+  </mat-form-field>
+  <button
+    matButton="filled"
+    type="submit"
+    [disabled]="!texto().trim() || deshabilitado()"
+  >
+    <mat-icon>search</mat-icon>
+    Buscar
+  </button>
+</form>

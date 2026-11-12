@@ -1,0 +1,19 @@
+:host { display: inline-flex; align-items: center; }
+.bandera {
+  display: block;
+  aspect-ratio: 3 / 2;
+  border-radius: 3px;
+  object-fit: cover;
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
+}
+.sin-bandera {
+  display: inline-grid;
+  place-items: center;
+  aspect-ratio: 3 / 2;
+  border-radius: 3px;
+  font-size: .625rem;
+  font-weight: 600;
+  letter-spacing: .04em;
+  background: color-mix(in srgb, currentColor 10%, transparent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, currentColor 18%, transparent);
+}

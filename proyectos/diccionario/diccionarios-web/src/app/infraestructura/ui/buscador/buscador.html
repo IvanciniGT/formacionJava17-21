@@ -1,0 +1,16 @@
+<section class="buscador">
+  <div class="idioma">
+    <app-selector-de-idioma
+      [idiomas]="idiomas()"
+      [seleccionado]="idioma()"
+      (cambiado)="cambiarIdioma($event)"
+    />
+  </div>
+  <div class="palabra">
+    <app-campo-de-palabra
+      [inicial]="palabra()"
+      [deshabilitado]="idiomas().length === 0"
+      (buscar)="irABusqueda($event)"
+    />
+  </div>
+</section>

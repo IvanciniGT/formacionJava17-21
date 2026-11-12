@@ -1,4 +1,4 @@
-# Java LTS: de Java 8 a Java 21 · proyecto diccionario, rama `v3.1-sugerencias`
+# Java LTS: de Java 8 a Java 21 · proyecto diccionario, rama `v4.0-frontal-web`
 
 Esta rama solo tiene el proyecto, tal y como estaba en esta versión. Las notas de cada día
 de clase están en la rama `main`.

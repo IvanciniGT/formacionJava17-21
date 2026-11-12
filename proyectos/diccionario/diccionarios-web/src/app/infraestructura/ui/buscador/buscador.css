@@ -1,0 +1,9 @@
+.buscador {
+  display: grid;
+  grid-template-columns: minmax(150px, 200px) 1fr;
+  gap: .75rem;
+  align-items: center;
+}
+@media (max-width: 640px) {
+  .buscador { grid-template-columns: 1fr; }
+}
